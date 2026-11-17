@@ -26,6 +26,11 @@ const projects = [
     { id: 'sistema-editorial', title: 'Sistema gráfico editorial', color: COLORS.rojo }
 ];
 
+if (process.env.FORCE_PLACEHOLDERS !== '1') {
+    console.error('Este generador está obsoleto y crea placeholders. Usa FORCE_PLACEHOLDERS=1 solo para pruebas temporales.');
+    process.exit(1);
+}
+
 async function generateProjectImages() {
     console.log('📸 Generando imágenes placeholder para proyectos...');
     

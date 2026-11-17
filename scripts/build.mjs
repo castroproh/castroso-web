@@ -165,7 +165,7 @@ function buildHeader(currentPage = '/') {
             <img src="${logoPath}" alt="" width="180" height="48" loading="lazy">
         </a>
         <nav class="main-nav" aria-label="Navegación principal">
-            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
                 <span class="nav-toggle-icon" aria-hidden="true"></span>
             </button>
             <ul id="nav-menu" class="nav-list">
@@ -276,7 +276,7 @@ function buildProjectCard(project) {
 <article class="project-card" data-category="${e(project.category)}" data-project-slug="${e(project.slug)}">
     <a href="${href}" class="project-card-link" aria-label="Ver proyecto: ${e(project.title)}">
         <div class="project-card-image">
-            <img src="${asset(cover)}" alt="" loading="lazy" width="400" height="300">
+            <img src="${asset(cover)}" alt="" loading="lazy" width="400" height="300" data-fit="${e(project.fit || 'cover')}">
             <span class="project-card-category">${e(project.category)}</span>
         </div>
         <div class="project-card-content">
@@ -456,6 +456,9 @@ async function build() {
     siteUrl: "${SITE_URL}",
     formspreeEndpoint: "${process.env.FORMSPREE_ENDPOINT || ''}",
     newsletterEndpoint: "${process.env.NEWSLETTER_ENDPOINT || ''}",
+    serviceCategories: ${JSON.stringify(Object.fromEntries(servicesData.categories.flatMap(category =>
+        category.services.map(service => [service.id, category.name])
+    )))},
     studio: ${JSON.stringify(siteConfig.studio)},
     contact: ${JSON.stringify(siteConfig.contact)}
 };`;
@@ -709,7 +712,11 @@ function buildProyectoPage(project) {
     
     return `
 <section class="project-hero" aria-labelledby="project-title" style="--project-color: ${project.meta?.color || siteConfig.colors['azul-electrico']};">
-    <div class="container">
+    <div class="project-hero-image" aria-hidden="true">
+        <img src="${asset(project.cover)}" alt="" loading="eager" width="1200" height="600" data-fit="${e(project.fit || 'cover')}">
+    </div>
+    <div class="project-hero-overlay" aria-hidden="true"></div>
+    <div class="container project-hero-content">
         <nav class="project-breadcrumb" aria-label="Ruta de navegación">
             <a href="${asset('/')}">Inicio</a>
             <span aria-hidden="true">/</span>
@@ -726,9 +733,6 @@ function buildProyectoPage(project) {
             </div>
         </header>
     </div>
-    <div class="project-cover" aria-hidden="true">
-        <img src="${asset(project.cover)}" alt="" loading="eager" width="1200" height="600">
-    </div>
 </section>
 
 <section class="project-content" aria-labelledby="project-desc-title">
@@ -736,6 +740,12 @@ function buildProyectoPage(project) {
         <div class="project-main">
             <h2 id="project-desc-title" class="sr-only">Descripción del proyecto</h2>
             <div class="project-description">${e(project.description).replace(/\n/g, '<br>')}</div>
+            ${project.image_label || project.image_note ? `
+            <p class="project-media-note">
+                ${project.image_label ? `<strong>${e(project.image_label)}.</strong> ` : ''}
+                ${project.image_note ? e(project.image_note) : ''}
+            </p>
+            ` : ''}
             
             ${project.gallery && project.gallery.length > 0 ? `
             <h2>Galería</h2>
@@ -743,7 +753,7 @@ function buildProyectoPage(project) {
                 ${project.gallery.map((img, i) => `
                 <figure class="gallery-item" role="listitem">
                     <a href="${asset(img)}" class="gallery-link" data-lightbox="${project.slug}" aria-label="Ver imagen ${i + 1} de ${project.gallery.length}">
-                        <img src="${asset(img)}" alt="${e(project.title)} - Vista ${i + 1}" loading="lazy">
+                        <img src="${asset(img)}" alt="${e(project.image_label || project.title)} - Vista ${i + 1}" loading="lazy" data-fit="${e(project.fit || 'cover')}">
                     </a>
                 </figure>
                 `).join('')}
@@ -948,14 +958,14 @@ function buildContactoPage() {
                     <p><strong>Tiempo de respuesta:</strong> 24–48h hábiles</p>
                 </div>
             </div>
-            <form class="contact-form" id="contact-form" novalidate>
+            <form class="contact-form" id="contact-form" method="post" novalidate>
                 <input type="hidden" name="${siteConfig.contact.honeypot_field}" value="" tabindex="-1" autocomplete="off">
                 ${fields.map(field => {
                     if (field.type === 'select') {
                         return `
                         <div class="form-group">
-                            <label for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
-                            <select id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''}>
+                            <label class="form-label" for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
+                            <select class="form-select" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''}>
                                 <option value="">Selecciona una opción</option>
                                 ${field.options.map(opt => `<option value="${e(opt)}">${e(opt)}</option>`).join('')}
                             </select>
@@ -964,22 +974,22 @@ function buildContactoPage() {
                     } else if (field.type === 'textarea') {
                         return `
                         <div class="form-group">
-                            <label for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
-                            <textarea id="${field.name}" name="${field.name}" rows="6" ${field.required ? 'required' : ''} placeholder="${e(field.placeholder || '')}"></textarea>
+                            <label class="form-label" for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
+                            <textarea class="form-textarea" id="${field.name}" name="${field.name}" rows="6" ${field.required ? 'required' : ''} placeholder="${e(field.placeholder || '')}"></textarea>
                         </div>
                         `;
                     } else {
                         return `
                         <div class="form-group">
-                            <label for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
-                            <input type="${field.type}" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''} placeholder="${e(field.placeholder || '')}">
+                            <label class="form-label" for="${field.name}">${e(field.label)}${field.required ? ' <span class="required" aria-hidden="true">*</span>' : ''}</label>
+                            <input class="form-input" type="${field.type}" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''} placeholder="${e(field.placeholder || '')}">
                         </div>
                         `;
                     }
                 }).join('')}
                 <button type="submit" class="btn btn-primary btn-block">${e(siteConfig.contact.submit_text)}</button>
-                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. Tus datos no se comparten con terceros.</p>
-                <div class="form-status" aria-live="polite" hidden></div>
+                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. Si se configura un proveedor externo para recibir solicitudes, su tratamiento de datos debe documentarse antes de activar los envíos.</p>
+                <div class="form-status" role="status" aria-live="polite" hidden></div>
             </form>
         </div>
     </div>
@@ -1020,7 +1030,7 @@ function buildPrivacidadPage() {
         
         <article class="privacy-section">
             <h2>2. Datos personales que recabamos</h2>
-            <p>Recabamos únicamente los datos necesarios para atender solicitudes de contacto y cotización:</p>
+            <p>El formulario solicita únicamente los datos necesarios para atender consultas y cotizaciones. Mientras no se configure un endpoint, el sitio no envía esos datos. Si se activa el newsletter, también se solicitará un correo electrónico.</p>
             <ul>
                 <li>Nombre completo</li>
                 <li>Correo electrónico</li>
@@ -1052,12 +1062,12 @@ function buildPrivacidadPage() {
         
         <article class="privacy-section">
             <h2>4. Transferencias de datos</h2>
-            <p>No transferimos tus datos personales a terceros, excepto:</p>
+            <p>Cuando se configure un endpoint de formularios, el proveedor que lo procese recibirá los datos enviados. Deben completarse aquí su identidad, condiciones y medidas aplicables antes de activar los envíos.</p>
             <ul>
                 <li>Cuando sea requerido por autoridad competente con fundamento legal</li>
-                <li>Proveedores de servicios tecnológicos necesarios (hosting, email, formularios) bajo contratos de confidencialidad</li>
+                <li>Proveedores de servicios tecnológicos necesarios, conforme a sus avisos y acuerdos aplicables</li>
             </ul>
-            <p>No vendemos, alquilamos ni compartimos tus datos con fines publicitarios de terceros.</p>
+            <p>No se afirma que un proveedor externo esté configurado actualmente.</p>
         </article>
         
         <article class="privacy-section">
@@ -1087,33 +1097,28 @@ function buildPrivacidadPage() {
         
         <article class="privacy-section">
             <h2>7. Uso de cookies y tecnologías similares</h2>
-            <p>Nuestro sitio web utiliza:</p>
+            <p>El sitio no integra actualmente herramientas propias de analítica ni una plataforma de gestión de cookies. Verifica los servicios de hosting y formularios que se configuren antes de publicar este aviso.</p>
             <ul>
-                <li><strong>Cookies técnicas necesarias:</strong> Para el funcionamiento del formulario</li>
-                <li><strong>Cookies de análisis (opcional):</strong> Solo si aceptas, para medir tráfico</li>
+                <li><strong>Servicios externos:</strong> Sus tecnologías y cookies deberán documentarse si se añaden o activan.</li>
             </ul>
-            <p>Puedes configurar tu navegador para bloquear o eliminar cookies.</p>
         </article>
         
         <article class="privacy-section">
             <h2>8. Seguridad de la información</h2>
-            <p>Implementamos medidas razonables para proteger tus datos:</p>
+            <p>Este sitio estático no almacena solicitudes en un servidor propio. La protección y el tratamiento del envío dependerán del hosting y del proveedor de formularios que se configure.</p>
             <ul>
-                <li>Comunicación cifrada mediante HTTPS/TLS</li>
-                <li>Validación y sanitización de entradas</li>
-                <li>Protección CSRF en formularios</li>
-                <li>Campo honeypot anti-spam</li>
-                <li>Limitación de tasa de envíos</li>
-                <li>Acceso restringido a datos solo a personal autorizado</li>
+                <li>El formulario aplica validación en el navegador; el proveedor deberá validar también los datos recibidos.</li>
+                <li>Incluye un campo honeypot, que no sustituye controles del proveedor.</li>
+                <li>La disponibilidad de HTTPS depende de la configuración de GitHub Pages.</li>
             </ul>
         </article>
         
         <article class="privacy-section">
             <h2>9. Conservación de datos</h2>
             <ul>
-                <li>Datos de formulario de contacto: 12 meses después del último contacto</li>
-                <li>Datos de clientes activos: Duración de la relación + 5 años (requisitos fiscales)</li>
-                <li>Logs de seguridad: 90 días</li>
+                <li>Datos enviados por formularios: [PENDIENTE: proveedor y plazo de conservación aplicable]</li>
+                <li>Datos asociados a una relación comercial: [PENDIENTE: definir plazos con asesoría legal]</li>
+                <li>Registros del hosting y de formularios: [PENDIENTE: confirmar políticas de cada proveedor]</li>
             </ul>
         </article>
         
