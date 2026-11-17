@@ -1,3 +1,4 @@
+
 name: Deploy CASTROSO.JPG to GitHub Pages
 
 on:
@@ -18,7 +19,13 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -47,9 +54,11 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy
         id: deployment
