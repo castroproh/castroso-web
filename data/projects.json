@@ -1,0 +1,65 @@
+{
+    "projects": [
+        {
+            "id": "identidad-castroso",
+            "slug": "identidad-castroso",
+            "title": "Identidad visual CASTROSO.JPG",
+            "category": "Identidad visual",
+            "categories": ["Identidad visual", "Diseño gráfico"],
+            "year": 2026,
+            "featured": true,
+            "published": false,
+            "cover": "/assets/images/projects/identidad-castroso/cover.jpg",
+            "gallery": [
+                "/assets/images/projects/identidad-castroso/01.jpg",
+                "/assets/images/projects/identidad-castroso/02.jpg",
+                "/assets/images/projects/identidad-castroso/03.jpg",
+                "/assets/images/projects/identidad-castroso/04.jpg"
+            ],
+            "description": "Diseño y desarrollo del sistema de identidad visual completo para CASTROSO.JPG. Incluye logotipo principal (imagotipo horizontal), isotipo, monograma, versiones monocromáticas, paleta cromática oficial, sistema gráfico editorial, patrón derivado del isotipo y aplicaciones de marca para web, redes sociales, papelería, fotografía y señalética.",
+            "credits": {
+                "direccion_arte": "Mateo",
+                "diseño_grafico": "Mateo",
+                "fotografia": "Santiel",
+                "produccion_audiovisual": "Santiel"
+            },
+            "meta": {
+                "seo_title": "Identidad visual CASTROSO.JPG — Diseño de marca y sistema gráfico",
+                "seo_description": "Sistema de identidad visual completo para CASTROSO.JPG: logotipo, isotipo, monograma, paleta cromática, patrón editorial y aplicaciones de marca.",
+                "og_image": "/assets/images/projects/identidad-castroso/og.jpg"
+            }
+        },
+        {
+            "id": "sistema-editorial",
+            "slug": "sistema-editorial",
+            "title": "Sistema gráfico editorial",
+            "category": "Diseño gráfico",
+            "categories": ["Diseño gráfico", "Diseño editorial"],
+            "year": 2026,
+            "featured": true,
+            "published": false,
+            "cover": "/assets/images/projects/sistema-editorial/cover.jpg",
+            "gallery": [
+                "/assets/images/projects/sistema-editorial/01.jpg",
+                "/assets/images/projects/sistema-editorial/02.jpg"
+            ],
+            "description": "Desarrollo del sistema gráfico editorial derivado de la identidad visual. Composiciones basadas en retículas, líneas de separación, bloques cromáticos, recortes tipográficos y recursos de impresión. Aplicado a carteles, papelería, encabezados web y piezas de comunicación.",
+            "credits": {
+                "direccion_arte": "Mateo",
+                "diseño_grafico": "Mateo"
+            },
+            "meta": {
+                "seo_title": "Sistema gráfico editorial CASTROSO.JPG — Diseño experimental",
+                "seo_description": "Sistema gráfico editorial con retículas, bloques cromáticos y recursos tipográficos experimentales para CASTROSO.JPG.",
+                "og_image": "/assets/images/projects/sistema-editorial/og.jpg"
+            }
+        }
+    ],
+    "categories": [
+        "Diseño gráfico",
+        "Fotografía",
+        "Audiovisual",
+        "Identidad visual",
+        "Diseño digital"
+    ]
+}

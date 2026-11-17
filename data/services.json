@@ -1,0 +1,279 @@
+{
+    "categories": [
+        {
+            "id": "diseno-grafico",
+            "name": "Diseño gráfico",
+            "description": "Diseño de identidades visuales, sistemas gráficos, piezas editoriales, cartelería, empaques y comunicación visual para marcas, bandas, emprendimientos y proyectos independientes.",
+            "icon": "diseno",
+            "services": [
+                {
+                    "id": "identidad-visual",
+                    "name": "Identidad visual",
+                    "description": "Creación de sistemas de marca completos: logotipo, isotipo, paleta cromática, tipografía, sistema gráfico, manual de identidad y aplicaciones base.",
+                    "includes": [
+                        "Imagotipo / Logotipo / Isotipo / Monograma",
+                        "Versiones color, monocromáticas y fondo oscuro/claro",
+                        "Paleta cromática oficial (6 colores)",
+                        "Tipografía principal y de apoyo",
+                        "Sistema gráfico editorial (retículas, líneas, bloques)",
+                        "Patrón derivado del isotipo",
+                        "Manual de identidad (PDF)",
+                        "Aplicaciones: papelería, redes, web, señalética"
+                    ],
+                    "modalidad": "Proyecto completo",
+                    "price_confirmed": false,
+                    "price_note": "Cotización según alcance y entregables",
+                    "examples": [
+                        "Identidad visual CASTROSO.JPG"
+                    ],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "diseno-editorial",
+                    "name": "Diseño editorial",
+                    "description": "Maquetación y diseño de publicaciones: zines, catálogos, portafolios, libros de artista, fanzines, revistas independientes y piezas impresas experimentales.",
+                    "includes": [
+                        "Concepto y estructura editorial",
+                        "Retículas y sistemas de página",
+                        "Tratamiento tipográfico expresivo",
+                        "Preparación para impresión (offset, risografía, digital)",
+                        "Archivos finales listos para producción"
+                    ],
+                    "modalidad": "Por publicación / pieza",
+                    "price_confirmed": false,
+                    "price_note": "Según páginas, complejidad y tirada",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "carteleria-afiches",
+                    "name": "Cartelería y afiches",
+                    "description": "Diseño de carteles para eventos, conciertos, exposiciones, festivales y campañas visuales. Enfoque experimental, tipografía como imagen y composición de alto impacto.",
+                    "includes": [
+                        "Concepto visual y composición",
+                        "Tipografía experimental / lettering",
+                        "Formatos: A3, A2, B2, 50x70cm, personalizado",
+                        "Versiones para impresión y digital (RRSS)",
+                        "Archivos listos para producción"
+                    ],
+                    "modalidad": "Por pieza",
+                    "price_confirmed": false,
+                    "price_note": "Según formato, complejidad y plazos",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "diseno-digital-web",
+                    "name": "Diseño web y digital",
+                    "description": "Diseño de interfaces web, landing pages, portafolios digitales y experiencias interactivas. Enfoque en rendimiento, accesibilidad y expresión visual.",
+                    "includes": [
+                        "Arquitectura de información y wireframes",
+                        "Diseño UI completo (desktop, tablet, mobile)",
+                        "Sistema de diseño y componentes",
+                        "Prototipo interactivo (Figma)",
+                        "Entrega de assets optimizados para desarrollo",
+                        "Desarrollo opcional (HTML/CSS/JS, PHP, WordPress, Astro)"
+                    ],
+                    "modalidad": "Proyecto completo / Por página",
+                    "price_confirmed": false,
+                    "price_note": "Según alcance, páginas y funcionalidades",
+                    "examples": [
+                        "Sitio web CASTROSO.JPG"
+                    ],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "menus-digitales",
+                    "name": "Menús digitales y carta interactiva",
+                    "description": "Diseño e implementación de menús digitales para restaurantes, bares y cafeterías. Acceso por QR, actualización remota, múltiples idiomas y diseño acorde a la identidad del local.",
+                    "includes": [
+                        "Diseño UI adaptado a la marca",
+                        "Categorías, descripciones, alérgenos, precios",
+                        "Panel de administración sencillo",
+                        "Código QR para mesas / entrada",
+                        "Hosting y dominio incluidos (1 año)",
+                        "Soporte y actualizaciones"
+                    ],
+                    "modalidad": "Paquete anual",
+                    "price_confirmed": false,
+                    "price_note": "Según número de locales y complejidad",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                }
+            ]
+        },
+        {
+            "id": "fotografia",
+            "name": "Fotografía",
+            "description": "Fotografía de retrato, producto, arquitectura, eventos, documental y experimentación analógica/digital. Enfoque en narrativa visual, luz y composición.",
+            "icon": "fotografia",
+            "services": [
+                {
+                    "id": "retrato-autor",
+                    "name": "Retrato y fotografía de autor",
+                    "description": "Sesiones de retrato para artistas, músicos, creativos, emprendedores y perfiles profesionales. Enfoque en personalidad, narrativa y estética cuidada.",
+                    "includes": [
+                        "Preproducción: concepto, moodboard, locación",
+                        "Sesión fotográfica (1-3 horas según paquete)",
+                        "Selección y edición profesional (color / B&W)",
+                        "Entrega digital en alta resolución (WebP/JPG)",
+                        "Licencia de uso personal / comercial según acuerdo"
+                    ],
+                    "modalidad": "Por sesión / paquete",
+                    "price_confirmed": false,
+                    "price_note": "Según duración, locación, entregables y uso",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "fotografia-producto",
+                    "name": "Fotografía de producto y still life",
+                    "description": "Fotografía para catálogos, e-commerce, redes sociales, packaging y publicidad. Iluminación controlada, fondo neutro o contextualizado, edición consistente.",
+                    "includes": [
+                        "Estudio o locación",
+                        "Iluminación profesional (flash / continua)",
+                        "Fondo blanco, negro, color o textura",
+                        "Retoque y edición de color",
+                        "Entrega en formatos web y print",
+                        "Opcional: 360°, video corto, GIF"
+                    ],
+                    "modalidad": "Por pieza / por jornada",
+                    "price_confirmed": false,
+                    "price_note": "Según cantidad, complejidad y postproducción",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "fotografia-arquitectura",
+                    "name": "Fotografía de arquitectura e interiores",
+                    "description": "Documentación fotográfica de espacios arquitectónicos, interiores, instalaciones y diseño de interiores. Perspectiva controlada, luz natural y artificial.",
+                    "includes": [
+                        "Recorrido previo y planificación de tomas",
+                        "Equipo: gran angular, tilt-shift, trípode",
+                        "HDR / bracketing para rango dinámico",
+                        "Corrección de perspectiva y distorsión",
+                        "Edición de color fiel al espacio",
+                        "Entrega en alta resolución"
+                    ],
+                    "modalidad": "Por jornada / proyecto",
+                    "price_confirmed": false,
+                    "price_note": "Según metros cuadrados, complejidad y entregables",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "cobertura-eventos",
+                    "name": "Cobertura de eventos y conciertos",
+                    "description": "Fotografía documental de eventos en vivo: conciertos, festivales, exposiciones, presentaciones, ferias y eventos corporativos. Captura de atmósfera, público, detalle y acción.",
+                    "includes": [
+                        "Cobertura completa del evento",
+                        "Equipo para baja luz / escenario",
+                        "Entrega rápida (24-48h) + selección final",
+                        "Edición consistente en lote",
+                        "Galería online para descarga",
+                        "Derechos de uso según acuerdo"
+                    ],
+                    "modalidad": "Por evento / jornada",
+                    "price_confirmed": false,
+                    "price_note": "Según duración, ubicación y entregables",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                }
+            ]
+        },
+        {
+            "id": "audiovisual",
+            "name": "Audiovisual",
+            "description": "Producción de video, edición, postproducción, motion graphics y contenido para redes sociales. Desde reels y clips hasta piezas documentales y videoclips.",
+            "icon": "audiovisual",
+            "services": [
+                {
+                    "id": "edicion-reels",
+                    "name": "Edición de Reels / Shorts / TikToks",
+                    "description": "Edición vertical para redes sociales: cuts rápidos, subtítulos dinámicos, transiciones, música, efectos de sonido, color grading y formatos optimizados por plataforma.",
+                    "includes": [
+                        "Edición vertical 9:16 (1080x1920)",
+                        "Subtítulos automáticos + corrección manual",
+                        "Música / SFX con licencia",
+                        "Color grading consistente",
+                        "Exportación optimizada (Instagram, TikTok, YouTube)",
+                        "Versiones con/sin marca de agua"
+                    ],
+                    "modalidad": "Por pieza / paquete mensual",
+                    "price_confirmed": false,
+                    "price_note": "Según duración, complejidad y frecuencia",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "edicion-video",
+                    "name": "Edición de video",
+                    "description": "Postproducción de piezas horizontales: videoclips, documentales, corporativos, aftermovies, cápsulas, tutoriales y contenido largo. Montaje narrativo, sonido, color y motion graphics.",
+                    "includes": [
+                        "Montaje narrativo / rítmico",
+                        "Diseño de sonido y mezcla básica",
+                        "Color grading (Rec.709 / Log)",
+                        "Motion graphics / tipografía en movimiento",
+                        "Subtítulos / cerrados (SRT)",
+                        "Entrega en múltiples codecs (H.264, H.265, ProRes)"
+                    ],
+                    "modalidad": "Por proyecto / por minuto final",
+                    "price_confirmed": false,
+                    "price_note": "Según duración, complejidad, material bruto y plazos",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "grabacion-audiovisual",
+                    "name": "Grabación y producción en set",
+                    "description": "Producción completa en locación o estudio: dirección de fotografía, cámara, iluminación, sonido directo, grip y coordinación. Para videoclips, spots, documentales, entrevistas y branded content.",
+                    "includes": [
+                        "Preproducción: guion técnico, storyboard, plan de rodaje",
+                        "Equipo: cámara 4K/6K, lentes cine, iluminación LED/HMI, audio profesional",
+                        "Crew: DP, operador de cámara, gaffer, sonidista, asistentes",
+                        "Dirección de arte y utilería (opcional)",
+                        "Dailies / respaldo diario",
+                        "Entrega de material bruto organizado + proxy"
+                    ],
+                    "modalidad": "Por jornada / proyecto",
+                    "price_confirmed": false,
+                    "price_note": "Según días de rodaje, crew, equipo y locaciones",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                },
+                {
+                    "id": "videoclips",
+                    "name": "Videoclips musicales",
+                    "description": "Concepto, preproducción, rodaje y postproducción de videoclips para artistas independientes, bandas y sellos. Narrativa visual, performance, danza, experimental o documental.",
+                    "includes": [
+                        "Desarrollo de concepto y tratamiento",
+                        "Preproducción completa (casting, locaciones, permisos, arte)",
+                        "Rodaje (1-3 jornadas típicas)",
+                        "Edición, VFX básicos, color grading",
+                        "Entrega master + versiones para plataformas",
+                        "Opcional: teaser, BTS, assets para RRSS"
+                    ],
+                    "modalidad": "Proyecto completo",
+                    "price_confirmed": false,
+                    "price_note": "Según concepto, días de rodaje, crew y postproducción",
+                    "examples": [],
+                    "cta_text": "Solicitar cotización",
+                    "active": true
+                }
+            ]
+        }
+    ],
+    "note": "Los precios mostrados son referenciales. Cada proyecto se cotiza según alcance, complejidad, plazos y derechos de uso. Contacta para una cotización formal."
+}

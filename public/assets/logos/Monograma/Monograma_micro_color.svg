@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600" viewBox="0 0 600 600">
+<title>CASTROSO.JPG - Identidad visual</title>
+<desc>Logotipo vectorial con trazados editables. Paleta oficial azul, rojo, verde, blanco papel y negro carbon.</desc>
+<defs><mask id="c-cut"><rect width="600" height="600" fill="white"/><path d="M 300 227 C 307 252 315 260 342 266 C 315 272 307 280 300 305 C 293 280 285 272 258 266 C 285 260 293 252 300 227 Z" fill="black"/></mask></defs>
+        <path d="M245 -11Q145 -11 92.0 55.5Q39 122 39 231Q38 300 52.0 370.0Q66 440 93.5 503.5Q121 567 161.5 617.0Q202 667 255.5 695.5Q309 724 374 724Q425 724 473.0 708.0Q521 692 557 665L482 532Q453 554 428.0 564.0Q403 574 378 574Q347 574 321.5 550.0Q296 526 277.0 487.5Q258 449 245.5 403.5Q233 358 226.5 315.0Q220 272 220 241Q220 188 237.0 164.0Q254 140 288 140Q320 140 353.5 151.0Q387 162 424 180L423 29Q380 8 334.5 -1.5Q289 -11 245 -11Z" fill="#F2F0EA" transform="translate(115 500) scale(0.770500 -0.670000)" mask="url(#c-cut)"/>
+        <path d="M 91 112 C 183 45 281 37 358 53" fill="none" stroke="#145BFF" stroke-width="25" stroke-linecap="butt"/>
+        <path d="M 360 528 C 432 515 490 481 527 438" fill="none" stroke="#E52B35" stroke-width="25" stroke-linecap="butt"/>
+</svg>

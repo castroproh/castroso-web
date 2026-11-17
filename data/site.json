@@ -1,0 +1,95 @@
+{
+    "studio": {
+        "name": "CASTROSO.JPG",
+        "tagline": "CREA. EXPERIMENTA. COMPARTE.",
+        "description": "Estudio creativo independiente que combina diseño gráfico, fotografía, producción audiovisual y experimentación visual desde Culiacán, Sinaloa, México.",
+        "location": "Culiacán, Sinaloa, México",
+        "instagram": "https://www.instagram.com/castroso.jpg/",
+        "email": "",
+        "whatsapp": "",
+        "categories": [
+            "Diseño gráfico",
+            "Fotografía",
+            "Audiovisual"
+        ]
+    },
+    "team": [
+        {
+            "name": "Mateo",
+            "roles": [
+                "Diseño gráfico",
+                "Identidad visual",
+                "Dirección de arte",
+                "Desarrollo web",
+                "Diseño digital"
+            ],
+            "description": "Diseñador gráfico y director de arte. Encargado de la identidad visual, el diseño editorial y el desarrollo digital del estudio."
+        },
+        {
+            "name": "Santiel",
+            "roles": [
+                "Fotografía",
+                "Grabación audiovisual"
+            ],
+            "description": "Fotógrafo y productor audiovisual. Responsable de la captura de imagen, la grabación y la postproducción visual."
+        }
+    ],
+    "seo": {
+        "title": "CASTROSO.JPG — Estudio creativo independiente | Diseño, Fotografía, Audiovisual",
+        "description": "Estudio creativo independiente en Culiacán, Sinaloa. Diseño gráfico, fotografía, producción audiovisual y experimentación visual. CREA. EXPERIMENTA. COMPARTE.",
+        "keywords": "estudio creativo, diseño gráfico, fotografía, producción audiovisual, Culiacán, Sinaloa, identidad visual, diseño editorial, diseño independiente",
+        "og_image": "/assets/images/og-default.jpg",
+        "twitter_card": "summary_large_image"
+    },
+    "navigation": [
+        { "label": "Inicio", "href": "/", "active": true },
+        { "label": "Proyectos", "href": "/proyectos/", "active": false },
+        { "label": "Servicios", "href": "/servicios/", "active": false },
+        { "label": "Estudio", "href": "/estudio/", "active": false },
+        { "label": "Contacto", "href": "/contacto/", "active": false }
+    ],
+    "colors": {
+        "negro-carbon": "#08090B",
+        "blanco-papel": "#F2F0EA",
+        "azul-electrico": "#145BFF",
+        "rojo-intenso": "#E52B35",
+        "verde-oscuro": "#187A50",
+        "gris-fotocopia": "#777777"
+    },
+    "contact": {
+        "form_fields": [
+            { "name": "nombre", "label": "Nombre", "type": "text", "required": true, "placeholder": "Tu nombre" },
+            { "name": "email", "label": "Correo electrónico", "type": "email", "required": true, "placeholder": "tu@email.com" },
+            { "name": "proyecto_nombre", "label": "Nombre del negocio, banda o proyecto", "type": "text", "required": true, "placeholder": "Nombre del proyecto" },
+            { "name": "servicio", "label": "Servicio de interés", "type": "select", "required": true, "options": [
+                "Diseño gráfico",
+                "Fotografía",
+                "Audiovisual",
+                "Identidad visual",
+                "Diseño web",
+                "Otro"
+            ]},
+            { "name": "presupuesto", "label": "Presupuesto aproximado (opcional)", "type": "select", "required": false, "options": [
+                "Menos de $5,000 MXN",
+                "$5,000 - $15,000 MXN",
+                "$15,000 - $30,000 MXN",
+                "$30,000 - $50,000 MXN",
+                "Más de $50,000 MXN",
+                "No definido aún"
+            ]},
+            { "name": "descripcion", "label": "Descripción del proyecto", "type": "textarea", "required": true, "placeholder": "Cuéntanos qué necesitas, referencias, objetivos, tiempos..." },
+            { "name": "fecha_estimada", "label": "Fecha estimada (opcional)", "type": "date", "required": false },
+            { "name": "medio_contacto", "label": "Medio preferido de contacto (opcional)", "type": "select", "required": false, "options": [
+                "Correo electrónico",
+                "WhatsApp",
+                "Instagram",
+                "Llamada",
+                "Sin preferencia"
+            ]}
+        ],
+        "honeypot_field": "website_url",
+        "submit_text": "Enviar solicitud",
+        "success_message": "Gracias por contactarnos. Revisaremos tu mensaje y te responderemos pronto.",
+        "error_message": "Hubo un error al enviar el formulario. Inténtalo de nuevo o escríbenos directamente a Instagram."
+    }
+}
