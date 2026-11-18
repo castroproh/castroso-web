@@ -42,3 +42,6 @@ coverage/
 !.env.example
 *.zip
 *.zip
+
+# Originales de fotografía del equipo (solo locales, nunca en el repo)
+assets-originals/

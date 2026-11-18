@@ -30,3 +30,19 @@ Los dos proyectos se muestran como trabajos vectoriales, con `fit: contain`, eti
 - Canonical, Open Graph, JSON-LD, sitemap, robots, manifest y rutas ajustables con `BASE_PATH` y `SITE_URL`.
 
 El aviso de privacidad aún contiene campos de información y revisión legal pendientes; consulta [PENDIENTES_PUBLICACION.md](PENDIENTES_PUBLICACION.md). El contenido de este informe describe la implementación del repositorio y no sustituye pruebas de publicación en GitHub Pages.
+
+## Corrección de maquetación (fase 2)
+
+Tras publicar la fase 1 se detectó en navegador que `main.css` conservaba selectores de una iteración anterior: el `build.mjs` generaba clases nuevas (`topbar`, `hero-grid`, `ticker`, `manifesto-*`, `discipline-row`, `studio-*`, `team-profile*`, `case-*`, `service-chapter`, `footer-top`, etc.) sin reglas asociadas, y el sitio compilaba sin maquetar.
+
+En esta rama se reescribió `main.css` completo (~3.300 líneas) cubriendo todas las clases del generador — auditado clase por clase contra el HTML producido, sin clases sin regla. Además:
+
+- Reset global `[hidden] { display: none !important }`: la paginación con `display: flex` anulaba el atributo `hidden` del filtrado.
+- Marquees con `overflow: hidden`, pista duplicada al 50 % y separadores propios entre términos; `prefers-reduced-motion` respetado.
+- SVG de proyectos con `object-fit: contain` sobre paneles con `aspect-ratio` (`.project-card-media`, `.project-cover`, `.gallery-link`); nunca recortados.
+- Lightbox corregido en `main.js`: `preventDefault` en el enlace de galería (antes la página navegaba al SVG), el cover deja de contar como diapositiva y se eliminó el `<style>` inline que pisaba el diseño de la hoja principal.
+- Leyendas de retrato con su rótulo inquebrantable y la función envolvente en límite de palabra.
+- Rejilla de la historia de Estudio en tres columnas reales y sellos del hero sin solaparse.
+- El prefill del formulario acepta además el id de servicio vía `serviceCategories` de `config.js`.
+
+Validación de la fase: `npm ci`, `npm run build`, `npm run check` correctos; `scrollWidth = viewport` en 7 páginas × 11 anchos (375–1440 px); consola y red sin errores; menú móvil, filtros, lightbox y prefill verificados en navegador. Capturas en resoluciones de 375 a 1440 px.

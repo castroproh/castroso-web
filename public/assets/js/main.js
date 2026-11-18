@@ -6,6 +6,9 @@
 (() => {
     'use strict';
 
+    // Marca el documento como "JS activo" para animaciones de entrada seguras
+    document.documentElement.classList.add('js');
+
     // ==========================================================================
     // Configuración desde config.js
     // ==========================================================================
@@ -67,6 +70,7 @@
 
         const handleKeydown = (e) => {
             const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+
             if (e.key === 'Escape' && isOpen) {
                 closeMenu();
                 toggle.focus();
@@ -103,6 +107,7 @@
             link.addEventListener('click', closeMenu);
         });
 
+        // Close on click outside the navigation
         document.addEventListener('click', (e) => {
             if (toggle.getAttribute('aria-expanded') === 'true' && !nav.contains(e.target)) {
                 closeMenu();
@@ -306,50 +311,75 @@
     // ==========================================================================
 
     const initScrollAnimations = () => {
-        if (prefersReducedMotion()) {
-            $$('.animate-entrance').forEach(el => el.style.opacity = '1');
+        const targets = $$('.animate-entrance');
+
+        if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+            targets.forEach(el => el.classList.add('is-visible'));
             return;
         }
 
         const observerOptions = {
             root: null,
-            rootMargin: '0px 0px -10% 0px',
-            threshold: 0.1
+            rootMargin: '0px 0px -8% 0px',
+            threshold: 0.08
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
+                    entry.target.classList.add('is-visible');
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        $$('.animate-entrance').forEach(el => observer.observe(el));
+        targets.forEach(el => observer.observe(el));
+    };
+
+    // ==========================================================================
+    // Contact Form — Prefill desde ?servicio=
+    // ==========================================================================
+
+    const initContactPrefill = () => {
+        const form = $('#contact-form');
+        if (!form) return;
+
+        const wanted = new URLSearchParams(window.location.search).get('servicio');
+        if (!wanted) return;
+
+        const select = form.querySelector('select[name="servicio"]');
+        if (!select) return;
+
+        const norm = (value) => String(value)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+
+        const match = Array.from(select.options).find(option =>
+            norm(option.value) === norm(wanted) || norm(option.textContent) === norm(wanted)
+        );
+
+        // Respaldo: si llega un id de servicio, mapea a su categoría
+        // (serviceCategories lo aporta config.js cuando el build lo incluye).
+        let target = match?.value;
+        if (!target && CONFIG.serviceCategories) {
+            const category = CONFIG.serviceCategories[wanted];
+            const byCategory = Array.from(select.options).find(option =>
+                category && norm(option.value) === norm(category)
+            );
+            if (byCategory) target = byCategory.value;
+        }
+
+        if (target) {
+            select.value = target;
+            select.setAttribute('aria-invalid', 'false');
+        }
     };
 
     // ==========================================================================
     // Form Handling (Formspree)
     // ==========================================================================
-
-    const initContactPrefill = () => {
-        const serviceSelect = $('#servicio');
-        const requestedService = new URLSearchParams(window.location.search).get('servicio');
-        if (!serviceSelect || !requestedService) return;
-
-        const normalize = value => value.normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-        const category = CONFIG.serviceCategories?.[requestedService];
-        const options = Array.from(serviceSelect.options);
-        const option = options.find(item => normalize(item.value) === normalize(requestedService))
-            || options.find(item => category && normalize(item.value) === normalize(category));
-
-        if (option) serviceSelect.value = option.value;
-    };
 
     const initContactForm = () => {
         const form = $('#contact-form');
@@ -457,9 +487,10 @@
                 return;
             }
 
+            // Sin endpoint real no se envía nada: se informa que no está disponible
             const endpoint = CONFIG.formspreeEndpoint;
             if (!endpoint) {
-                showMessage('warning', 'El formulario no está activo todavía. Puedes contactarnos por Instagram mientras configuramos el envío.');
+                showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
                 return;
             }
 
@@ -467,7 +498,7 @@
 
             try {
                 const formData = new FormData(form);
-                
+
                 // Remove honeypot from submission
                 if (CONFIG.contact?.honeypot_field) {
                     formData.delete(CONFIG.contact.honeypot_field);
@@ -520,7 +551,7 @@
                 console.error('Form submission error:', error);
                 
                 if (!CONFIG.formspreeEndpoint) {
-                    showMessage('warning', 'El formulario no está activo todavía. Puedes contactarnos por Instagram mientras configuramos el envío.');
+                    showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
                 } else {
                     showMessage('error', 'Error de conexión. Inténtalo de nuevo o escríbenos directamente por Instagram.');
                 }
@@ -543,8 +574,13 @@
         const endpoint = CONFIG.newsletterEndpoint;
 
         if (!endpoint) {
-            // Disable if no endpoint
-            form.innerHTML = '<p class="form-disclaimer">Suscríbete a nuestro newsletter próximamente. Síguenos en <a href="' + CONFIG.studio?.instagram + '" target="_blank" rel="noopener">Instagram</a> mientras tanto.</p>';
+            // No hay integración real: se informa y no se simula suscripción
+            const ig = CONFIG.studio?.instagram;
+            form.innerHTML = '<p class="form-disclaimer">La suscripción al newsletter todavía no está habilitada. ' +
+                (ig
+                    ? 'Síguenos en <a href="' + ig + '" target="_blank" rel="noopener noreferrer">Instagram</a> mientras tanto.'
+                    : 'Vuelve pronto.') +
+                '</p>';
             return;
         }
 
@@ -582,7 +618,8 @@
     // ==========================================================================
 
     const initGalleryLightbox = () => {
-        const galleryImages = $$('[data-lightbox] img, .project-cover img, .gallery-item img');
+        // Solo la galería: el cover ya se muestra en el encabezado del proyecto.
+        const galleryImages = $$('[data-lightbox] img, .gallery-item img');
         if (galleryImages.length === 0) return;
 
         let lightbox = null;
@@ -621,62 +658,6 @@
                 <div class="lightbox-counter"></div>
             `;
             document.body.appendChild(lightbox);
-
-            const style = document.createElement('style');
-            style.textContent = `
-                .lightbox {
-                    position: fixed;
-                    inset: 0;
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(8, 9, 11, 0.98);
-                    backdrop-filter: blur(10px);
-                    opacity: 0;
-                    visibility: hidden;
-                    transition: opacity 0.3s ease, visibility 0.3s ease;
-                }
-                .lightbox:not([hidden]) {
-                    opacity: 1;
-                    visibility: visible;
-                }
-                .lightbox-overlay { position: absolute; inset: 0; }
-                .lightbox-close,
-                .lightbox-prev,
-                .lightbox-next {
-                    position: absolute;
-                    width: 48px;
-                    height: 48px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(242, 240, 234, 0.05);
-                    border: 1px solid rgba(242, 240, 234, 0.1);
-                    border-radius: 50%;
-                    color: #F2F0EA;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    z-index: 10;
-                }
-                .lightbox-close { top: 24px; right: 24px; }
-                .lightbox-prev { left: 24px; top: 50%; transform: translateY(-50%); }
-                .lightbox-next { right: 24px; top: 50%; transform: translateY(-50%); }
-                .lightbox-close:hover { background: rgba(229, 43, 53, 0.2); border-color: #E52B35; color: #E52B35; }
-                .lightbox-prev:hover,
-                .lightbox-next:hover { background: rgba(20, 91, 255, 0.2); border-color: #145BFF; color: #145BFF; }
-                .lightbox-content { max-width: 90vw; max-height: 85vh; }
-                .lightbox-image { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
-                .lightbox-caption { text-align: center; margin-top: 16px; color: #777777; font-size: 0.875rem; }
-                .lightbox-counter { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: #777777; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
-                @media (max-width: 768px) {
-                    .lightbox-prev { left: 12px; width: 44px; height: 44px; }
-                    .lightbox-next { right: 12px; width: 44px; height: 44px; }
-                    .lightbox-close { top: 12px; right: 12px; width: 40px; height: 40px; }
-                }
-                @media (prefers-reduced-motion: reduce) { .lightbox { transition: none; } }
-            `;
-            document.head.appendChild(style);
 
             lightbox.querySelectorAll('[data-lightbox-close]').forEach(el => {
                 el.addEventListener('click', closeLightbox);
@@ -739,7 +720,17 @@
 
         galleryImages.forEach((img, index) => {
             img.style.cursor = 'zoom-in';
-            img.addEventListener('click', () => openLightbox(index));
+            const link = img.closest('a');
+            if (link) {
+                // Los enlaces de galería apuntan al recurso completo:
+                // se abre el lightbox en lugar de navegar fuera de la página.
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openLightbox(index);
+                });
+            } else {
+                img.addEventListener('click', () => openLightbox(index));
+            }
         });
     };
 

@@ -2,6 +2,8 @@
 
 El build y el despliegue técnico del sitio estático no dependen de los datos de esta lista. No habilites formularios ni presentes el aviso legal como aprobado hasta recibir y revisar la información correspondiente.
 
+> Estado tras la fase 2: sitio maquetado y verificado (CSS alineado al HTML generado, QA en 11 anchos, interacciones y consola sin errores). Los pendientes de esta lista siguen sin datos reales y no se han inventado.
+
 ## Información que debe aportar el estudio
 
 - `studio.email`: correo real para contacto y solicitudes ARCO.
