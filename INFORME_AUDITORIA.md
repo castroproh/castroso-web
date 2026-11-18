@@ -1,125 +1,30 @@
-# INFORME DE AUDITORÍA — CASTROSO.JPG (Sitio estático)
+# Informe de auditoría — CASTROSO.JPG
 
-**Proyecto:** CASTROSO.JPG — Sitio estático para GitHub Pages  
-**Origen:** ZIP 1 (`castroso-static`)  
-**Fecha de auditoría:** 2026-11-16  
-**Entorno:** Node v26.8.1, npm 11.19.0  
-**Estado:** Producción-ready (páginas estáticas, sin backend)
+**Fecha:** 17 de noviembre de 2026
+**Alcance:** revisión del generador, recursos del sitio, interacciones principales, enlaces locales y build estático. Este informe registra solo comprobaciones realizadas en esta revisión; no certifica una auditoría WCAG ni un despliegue en GitHub Pages.
 
-> **Nota:** este informe corresponde a una auditoría anterior. Para el rediseño integral y el estado actual del sitio, ver `INFORME_REDISENO.md`.
+## Hallazgos corregidos
 
----
+- El menú tenía controlador HTML/JavaScript, pero la hoja de estilos no definía el header, el botón ni el estado de navegación móvil. Se incorporaron estilos para escritorio y menú móvil hasta 860 px, estado accesible del botón, cierre con Escape, clic exterior, foco en el primer enlace, cierre al navegar y restauración del scroll.
+- El formulario de contacto podía intentar enviar a `form.action` aunque no existiera un endpoint real. Ahora valida los campos, asocia los errores con `aria-describedby` y, si falta `FORMSPREE_ENDPOINT`, muestra un aviso sin iniciar una petición ni afirmar que el mensaje se envió.
+- Los dos proyectos reales estaban marcados como borradores y solo tenían imágenes JPG generadas con texto de muestra. Se publican como proyectos vectoriales con logos e ilustraciones SVG ya existentes, `fit: contain`, explicación textual de los medios y sus páginas individuales. Se retiraron los JPG placeholder y el generador ya no los crea salvo activación explícita de prueba.
+- El listado de servicios usa `filter-btn`, pero la hoja de estilos existente definía `.filter-btn--active`; se añadió el estilo para la clase `.active` que aplica el JavaScript.
+- El aviso de privacidad afirmaba medidas de seguridad, cookies, transferencias y plazos de retención no verificables en este sitio estático. Se aclaró que el envío de formularios está deshabilitado sin endpoint y que el tratamiento por servicios externos y los plazos deben confirmarse antes de activarlos.
 
-## 1. Resumen ejecutivo
+## Build y comprobaciones automatizadas
 
-El sitio fuente (ZIP 1) ya generaba correctamente 9 páginas estáticas + sitemap + robots. La auditoría detectó y corrigió problemas de escasez de seguridad (escapado de entidades HTML, filtros de proyectos borrador, activos rotos en subruta `BASE_PATH`), navegación activa incorrecta, plantillas de proyecto sin `data-project-slug`, ausencia de página `500.html`, y URLs de navegación con sufijo `.php` heredados. Se añadieron tipografías web con licencia OFL (Sora + JetBrains Mono), se documentaron todos los datos pendientes y se preparó la entrega en dos ZIP: **A (fuente)** y **B (dist)**.
+En Node.js 26.8.1/npm 11.19.0 se ejecutaron `npm ci`, `npm run build:prod`, `npm run check`, `node --check` sobre los scripts JavaScript y `git diff --check`. El build generó 10 HTML (8 páginas generales y 2 fichas de proyecto); el chequeo confirmó 8 URLs de sitemap y 363 referencias locales válidas.
 
----
+Se revisó la salida de `dist/` para comprobar páginas de error, manifest, robots, sitemap, `.nojekyll`, configuración runtime, prefijos de rutas, recursos SVG publicados y presencia de ambos proyectos. El workflow existente usa Node 22, `npm ci`, `npm run build`, sube `dist/` y despliega con `actions/deploy-pages@v4`; no se modificó.
 
-## 2. Alcance de la auditoría
+## Interacciones y límites de verificación
 
-| Elemento | Resultado |
-|----------|-----------|
-| 8 páginas HTML (`/`, `/proyectos/`, `/servicios/`, `/estudio/`, `/contacto/`, `/privacidad/`, `/404.html`, `/500.html`) | Generadas y verificadas |
-| `sitemap.xml`, `robots.txt`, `manifest.json`, `.nojekyll` | Generados y verificados |
-| Assets: CSS, JS, fuentes WOFF2, iconos, logos, imágenes OG/proyectos | Copiados y accesibles |
-| Build con `BASE_PATH=''` y `BASE_PATH=/repositorio/` | Rutas corregidas, 0 enlaces con prefijo erróneo |
-| Enlaces rotos (audit de 8 páginas) | Solo `#` y `?servicio=` (intencionales); 0 objetivos reales faltantes |
-| `mailto:` condicional (`studio.email` vacío → sin enlace) | Implementado |
-| CNAME | No se comite (solo vía `CUSTOM_DOMAIN` env) |
+Headless Chrome verificó 10 páginas a 375, 390, 768, 860, 1024, 1280, 1366 y 1440 px: sin overflow horizontal, navegación visible según breakpoint y sin imágenes rotas. También se probaron apertura/cierre del menú y restauración del scroll con Escape, filtro de proyectos, acordeón de servicios y newsletter deshabilitado, prellenado por servicio, validación de campos obligatorios y estado honesto del formulario sin endpoint (sin petición de red), además de ajuste vectorial `contain` y apertura/cierre del lightbox con Escape.
 
----
+El HTML compilado confirma ocho campos del formulario con etiquetas asociadas, cinco obligatorios, opciones requeridas/opcionales, honeypot y estado anunciado. No se probó el formato de email inválido, paginación (el catálogo actual tiene solo dos proyectos), el resultado visual de cada filtro ni envíos a servicios externos: los endpoints no están configurados, por lo que ningún envío real se puede ni se debe simular. Tampoco se calculó contraste WCAG ni se midió cada área táctil en navegador; hace falta una auditoría dedicada para esos puntos. Las alertas de contraste sobre texto decorativo dibujado solo con contorno requieren inspeccionar nodo y método antes de clasificarse como texto funcional.
 
-## 3. Cambios realizados
+No se ejecutó el workflow remoto de GitHub Actions ni se verificó un deploy publicado; la consulta a la API de Actions expiró por timeout. El dominio y el formulario de contacto no están disponibles para comprobarse en producción.
 
-### 3.1 `scripts/build.mjs` (reescritura parcial)
-- `e()` escapa `&amp;` primero, luego `<`, `>`, `"`, `'`, evitando doble escape.
-- `BASE_PATH` y `SITE_URL` normalizados (se elimina barra final).
-- Filtro de proyectos: `published !== false && draft !== true` (proyectos borrador no se generan ni publican).
-- Función `validateData()`: valida `site.json`, `projects.json`, `services.json` y emite advertencias (no falla el build).
-- `buildNavigation()` con `normalizePath()`: estados `active` correctos en home y páginas internas.
-- `buildProjectCard()` añade atributo `data-project-slug`.
-- `buildProyectoPage()`: navegación prev/next mediante índice limpio del array filtrado.
-- Nueva `build500Page()` que genera `dist/500.html` (GitHub Pages no asigna respuestas 500 automáticas).
-- `robots.txt`: rutas `Disallow` prefijadas con `BASE_PATH`.
-- Enlaces `mailto:` condicionales: solo si `siteConfig.studio.email` no está vacío.
+## Pendiente antes de operación comercial
 
-### 3.2 `data/projects.json`
-- Añadido `"published": false` a ambos proyectos de ejemplo (`identidad-castroso`, `sistema-editorial`) porque sus imágenes son placeholders generados, no fotografías definitivas.
-
-### 3.3 `data/site.json`
-- Navegación: sufijo `.php` eliminado; trailing slashes normalizados.
-
-### 3.4 `public/assets/css/main.css`
-- Añadidos `@font-face` para Sora y JetBrains Mono (variables WOFF2 locales) con `font-display: swap`.
-
-### 3.5 `public/assets/fonts/`
-- `Sora-VariableFont_wght.woff2`, `JetBrainsMono-VariableFont_wght.ttf` (convertido a WOFF2 por el build si aplica) + licencias OFL: `LICENSE-SORA.txt`, `LICENSE-JETBRAINS-MONO.txt`.
-
-### 3.6 `.github/workflows/deploy.yml`
-- `node-version: '20'` → `'lts/*'` (compatibilidad con Node 26 local y GitHub Actions).
-
-### 3.7 `README.md`
-- Documentados: página `500.html`, proyectos borrador (`published: false`), fuentes + licencias OFL, regla de no comitear `CNAME`, secrets Formspree, checklist de build/Pages actualizado.
-
----
-
-## 4. Resultados de pruebas (build)
-
-Comando: `npm run build` (Node 26.8.1, `npm ci` previo OK)
-
-| Prueba | Resultado |
-|--------|-----------|
-| Build por defecto (`BASE_PATH=''`) | ✅ Éxito, `dist/` generado |
-| Build con `BASE_PATH=/repositorio/` | ✅ 0 enlaces con prefijo erróneo; canonical/sitemap/robots con prefijo correcto |
-| Servir `dist/` en localhost:3101 (root) | ✅ 200 en `/`, `/contacto/`, `/404.html`, `/500.html`, `/manifest.json`, `/sitemap.xml`, `/robots.txt` |
-| Servir `dist/` en localhost:3102 (`/repositorio/`) | `serve` no monta subruta; verificado por inspección de prefijos en HTML (0 fallos) |
-| Generadores de assets (`favicons`, `og`, `project-images`) | ✅ Todos generan sin errores |
-| Auditoría de enlaces (8 páginas HTML) | ✅ 0 objetivos reales faltantes; solo `#` y `?servicio=` (intencionales) |
-
----
-
-## 5. Datos pendientes antes de producción
-
-| Categoría | Campo | Detalle |
-|-----------|-------|---------|
-| Legales (privacidad) | Domicilio notificaciones | `[PENDIENTE]` en `privacidad/index.html` |
-| Legales | Correo contacto legal | `[PENDIENTE]` |
-| Legales | Responsable protección datos | `[PENDIENTE]` |
-| Legales | Asesoría LFPDPPP | Pendiente revisión legal |
-| Contacto (`site.json`) | `studio.email` | Vacío → sin `mailto:` hasta configurar |
-| Contacto (`site.json`) | `studio.whatsapp` | Vacío |
-| Formspree | `FORMSPREE_ENDPOINT` | Crear formulario contacto en formspree.io |
-| Formspree | `NEWSLETTER_ENDPOINT` | Opcional, para newsletter del footer |
-| Imágenes proyectos | `identidad-castroso` / `sistema-editorial` | Reemplazar placeholders por fotos reales; marcar `"published": true` |
-| Dominio `castroso.jpg` | DNS (A ×4 + CNAME www) | Configurar antes de activar en GitHub Pages |
-| Dominio | HTTPS | Activar "Enforce HTTPS" en GitHub Pages tras DNS |
-
----
-
-## 6. Entregables
-
-| Archivo | Contenido |
-|---------|-----------|
-| `castroso-static-final.zip` | ZIP A: fuente completa (excluye `node_modules/`, `dist/`, `.git`, secretos) |
-| `castroso-static-dist.zip` | ZIP B: contenido de `dist/` listo para subir a GitHub Pages |
-| `INFORME_AUDITORIA.md` | Este informe |
-| `GUIA_REPOSITORIO_GITHUB.md` | Crear y subir repositorio |
-| `GUIA_SUBIR_PROYECTO.md` | Subir proyecto (ZIP A o ZIP B) |
-| `GUIA_ACTIVAR_PAGES.md` | Activar GitHub Pages |
-| `GUIA_DOMINIO_CASTROSO_JPG.md` | Conectar dominio `castroso.jpg` |
-| `GUIA_FORMSPREE.md` | Configurar Formspree (contacto + newsletter) |
-| `README.md` | Documentación actualizada del sitio |
-
----
-
-## 7. Notas técnicas
-
-- No se comitea ningún `CNAME` ni `.env`. Los secretos (`FORMSPREE_ENDPOINT`, `NEWSLETTER_ENDPOINT`) van solo en GitHub Actions Secrets.
-- `npm run preview` (`npx serve dist -p 3000`) funciona en Node v26.8.1 (verificado: `/` y `/assets/css/main.css` responden 200).
-- GitHub Pages como **sitio de usuario/organización** (`usuario.github.io`): `BASE_PATH=`. Como **proyecto** (`usuario.github.io/repo/`): `BASE_PATH=/repositorio/` y `SITE_URL=https://usuario.github.io`.
-- Estado posterior al rediseño: ambos proyectos están marcados `"published": true` y generan `/proyectos/[slug]/`; sus imágenes generadas fueron eliminadas y se usan los SVG originales. Ver `INFORME_REDISENO.md` y `PENDIENTES_PUBLICACION.md`.
-
----
-
-**— Fin del informe —**
+El deploy estático no requiere servicios comerciales. La recepción de consultas requiere que el estudio aporte y configure `FORMSPREE_ENDPOINT`; el newsletter, si se desea, requiere `NEWSLETTER_ENDPOINT`. También hacen falta `studio.email`/`studio.whatsapp` si el estudio quiere esos canales, domicilio y responsable reales, revisión legal de los campos `[PENDIENTE]` y plazos/terceros aplicables. Estos datos no se han inventado. Un dominio propio es opcional.

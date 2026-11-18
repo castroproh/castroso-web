@@ -1,68 +1,32 @@
-# PENDIENTES DE PUBLICACIÓN — CASTROSO.JPG
+# Pendientes para la publicación comercial
 
-**Fecha:** 2026-11-17 (actualizado tras la fase 2 de maquetación)
-**Alcance:** datos que faltan para producción y que **no se han inventado** en el repositorio.
-**Estado actual:** sitio estático completo, maquetado y verificado (CSS alineado al HTML generado, QA en 11 anchos, interacciones y consola sin errores); sin estos datos, algunas funciones se omiten o muestran un aviso en lugar de simular éxito.
+El build y el despliegue técnico del sitio estático no dependen de los datos de esta lista. No habilites formularios ni presentes el aviso legal como aprobado hasta recibir y revisar la información correspondiente.
 
----
+> Estado tras la fase 2: sitio maquetado y verificado (CSS alineado al HTML generado, QA en 11 anchos, interacciones y consola sin errores). Los pendientes de esta lista siguen sin datos reales y no se han inventado.
 
-## 1. Datos del estudio (`data/site.json`)
+## Información que debe aportar el estudio
 
-| Campo | Valor actual | Efecto | Cómo completar |
-|-------|--------------|--------|----------------|
-| `studio.email` | `""` (vacío) | No se renderiza enlace `mailto:` en footer ni en contacto. | Escribir el correo real en `data/site.json`. |
-| `studio.whatsapp` | `""` (vacío) | No se renderiza enlace de WhatsApp. | Escribir `https://wa.me/521XXXXXXXXXX` en `data/site.json`. |
-| `studio.instagram` | `https://www.instagram.com/castroso.jpg/` | ✅ Funcional. | — |
-| `studio.location` | `Culiacán, Sinaloa, México` | ✅ Funcional. | — |
+- `studio.email`: correo real para contacto y solicitudes ARCO.
+- `studio.whatsapp`: URL real de WhatsApp Business, si se desea ofrecer ese canal.
+- Domicilio completo para notificaciones del responsable de datos.
+- Nombre de la persona responsable de protección de datos, si corresponde.
+- Revisión legal del aviso de privacidad: finalidades, plazos de conservación, terceros que reciben datos, procedimientos y textos aplicables.
+- Confirmar qué servicios externos usarán cookies o tecnologías de seguimiento; el sitio no integra analítica propia actualmente.
 
-> Si se añaden otros perfiles (Behance, LinkedIn, TikTok, YouTube), agregarlos en `site.json` y en el footer/estudio.
+## Servicios que debe configurar el estudio
 
-## 2. Formularios
+- `FORMSPREE_ENDPOINT`: endpoint real del formulario de contacto. Mientras esté vacío, el formulario valida localmente y no transmite datos.
+- `NEWSLETTER_ENDPOINT`: endpoint real del newsletter, solo si se va a habilitar.
+- Revisar los avisos y condiciones del proveedor elegido e incorporarlos al aviso de privacidad antes de activarlo. No se han creado cuentas ni endpoints externos.
 
-| Elemento | Estado actual | Acción |
-|----------|---------------|--------|
-| Formulario de contacto | Sin endpoint. Al enviar muestra: “El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.” **No simula éxito.** | Crear formulario en Formspree → copiar endpoint → añadir **GitHub Actions Secret** `FORMSPREE_ENDPOINT`. Ver `GUIA_FORMSPREE.md`. |
-| Newsletter | `action="#"`, sin endpoint. Muestra aviso y enlace a Instagram. | Opcional. Añadir secret `NEWSLETTER_ENDPOINT` si se decide activar. |
+## Medios y dominio
 
-- Honeypot configurado: campo `website_url` (`contact.honeypot_field`).
-- Mensajes configurables: `contact.success_message` / `contact.error_message`.
+- Los dos proyectos publicados son trabajos de identidad/diseño gráfico y usan vectores oficiales ya existentes en `public/assets/`; no requieren fotografías para conservar su presentación actual. Para publicar otros proyectos fotográficos o audiovisuales, el estudio debe aportar sus medios originales definitivos.
+- El dominio propio es opcional; solo si se decide usarlo habrá que aportar el dominio y configurar su DNS y GitHub Pages.
 
-## 3. Aviso de privacidad (`/privacidad/`)
+## Qué bloquea cada publicación
 
-Campos marcados visiblemente con `[PENDIENTE]` que requieren revisión legal (LFPDPPP, México):
-
-- [ ] **Domicilio completo** para notificaciones.
-- [ ] **Correo de contacto legal**.
-- [ ] **Responsable de protección de datos** (nombre).
-- [ ] Revisión y validación final del texto por asesoría legal.
-
-Ubicación en código: `scripts/build.mjs` → `buildPrivacidadPage()` (líneas con `[PENDIENTE]`).
-
-## 4. Contenido visual
-
-| Elemento | Estado actual | Acción (opcional) |
-|----------|---------------|-------------------|
-| Portadas de proyectos | Originales vectoriales (SVG) de cada proyecto, mostrados con `object-fit: contain` y nota de que son piezas gráficas, no fotografías. | Si se dispone de fotos/mockups reales, sustituir `cover`, `gallery[]` y `meta.og_image` en `data/projects.json`. |
-| Imágenes de equipo | Iniciales sobre fondo (sin fotos). | Opcional: aportar retratos reales. |
-| OG default | `/assets/images/og-default.jpg` generado. | ✅ Listo. |
-
-## 5. Dominio y despliegue
-
-| Elemento | Estado | Acción |
-|----------|--------|--------|
-| Repositorio | `castroproh/castroso-web`, rama `main`. | — |
-| GitHub Pages | Workflow `deploy.yml` (Node 22, `npm ci`, `npm run build`, `deploy-pages`). | Activar Pages → GitHub Actions. Ver `GUIA_ACTIVAR_PAGES.md`. |
-| `BASE_PATH` / `SITE_URL` | Se derivan de secrets/variables del workflow (`/castroso-web/`, `https://castroproh.github.io`). | Ajustar si cambia el nombre del repo. |
-| Dominio `castroso.jpg` | Sin `CNAME`. | Opcional: configurar DNS + HTTPS y `CUSTOM_DOMAIN`. Ver `GUIA_DOMINIO_CASTROSO_JPG.md`. |
-
-## 6. Verificaciones pendientes de credenciales
-
-No fue posible validar en entorno real (requieren credenciales):
-
-- Envío real del formulario con `FORMSPREE_ENDPOINT` configurado.
-- Envío real del newsletter con `NEWSLETTER_ENDPOINT` configurado.
-- Dominio propio y certificado HTTPS.
-
----
-
-**Nota:** el build y las interacciones locales (menú, filtros, validación, estados sin endpoint) están verificados con Chrome headless y `npm ci`/`npm run build` en Node v26.8.1. Ver `INFORME_REDISENO.md`.
+- **Deploy técnico:** ninguno de los datos anteriores; GitHub Pages puede desplegar el sitio estático.
+- **Contacto comercial por formulario:** bloqueado hasta configurar `FORMSPREE_ENDPOINT`.
+- **Newsletter:** bloqueado hasta configurar `NEWSLETTER_ENDPOINT`.
+- **Publicación comercial completa:** bloqueada hasta completar los datos reales del responsable y aprobar el aviso de privacidad. El correo y WhatsApp son opcionales como canales, pero no deben inventarse.

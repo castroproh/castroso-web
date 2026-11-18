@@ -243,8 +243,7 @@ function buildHeader(currentPage = '/') {
             <img src="${logoPath}" alt="${e(siteConfig.studio.name)}" width="180" height="37">
         </a>
         <nav class="main-nav" aria-label="Navegación principal">
-            <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
-                <span class="nav-toggle-text">Menú</span>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir menú">
                 <span class="nav-toggle-icon" aria-hidden="true"></span>
             </button>
             <ul id="nav-menu" class="nav-list">
@@ -515,6 +514,9 @@ async function build() {
     siteUrl: "${SITE_URL}",
     formspreeEndpoint: "${process.env.FORMSPREE_ENDPOINT || ''}",
     newsletterEndpoint: "${process.env.NEWSLETTER_ENDPOINT || ''}",
+    serviceCategories: ${JSON.stringify(Object.fromEntries(servicesData.categories.flatMap(category =>
+        category.services.map(service => [service.id, category.name])
+    )))},
     studio: ${JSON.stringify(siteConfig.studio)},
     contact: ${JSON.stringify(siteConfig.contact)}
 };`;
@@ -1431,11 +1433,11 @@ function buildContactoPage() {
                 <span class="eyebrow">02 / Formulario</span>
                 <p>Los campos marcados con <span class="required">*</span> son obligatorios.</p>
             </div>
-            <form class="contact-form" id="contact-form" novalidate>
+            <form class="contact-form" id="contact-form" method="post" novalidate>
                 <input type="hidden" name="${siteConfig.contact.honeypot_field}" value="" tabindex="-1" autocomplete="off">
                 ${fieldMarkup}
                 <button type="submit" class="btn btn-primary btn-block">${e(siteConfig.contact.submit_text)} <span aria-hidden="true">→</span></button>
-                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. Tus datos no se comparten con terceros.</p>
+                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. El envío externo solo debe activarse con un proveedor real y documentado.</p>
                 <div class="form-status" aria-live="polite" hidden></div>
             </form>
         </div>
@@ -1459,143 +1461,139 @@ window.CONTACT_CONFIG = {
 function buildPrivacidadPage() {
     const studioName = siteConfig.studio.name;
     return `
-<section class="page-hero page-hero--legal" aria-labelledby="page-title">
+<section class="page-hero" aria-labelledby="page-title">
     <div class="container">
-        <div class="page-hero-top">
-            <span class="eyebrow">Legal</span>
-            <span class="mono">Versión 1.0</span>
-        </div>
         <h1 id="page-title" class="page-title">Aviso de privacidad</h1>
-        <div class="page-hero-bottom">
-            <p class="page-subtitle">Información sobre el tratamiento de tus datos personales.</p>
-        </div>
+        <p class="page-subtitle">Información sobre el tratamiento de tus datos personales</p>
     </div>
 </section>
 
 <section class="privacy-content" aria-labelledby="privacy-title">
-    <h2 id="privacy-title" class="sr-only">Aviso de privacidad</h2>
-    <div class="privacy-notice">
-        <strong>Aviso importante:</strong> este aviso contiene campos marcados con <code>[PENDIENTE]</code> que deben completarse con asesoría legal antes de publicar en producción. Consulta la LFPDPPP (México).
-    </div>
-
-    <article class="privacy-section">
-        <h2>1. Identidad y domicilio del responsable</h2>
-        <p><strong>Responsable:</strong> ${e(studioName)}</p>
-        <p><strong>Domicilio:</strong> [PENDIENTE: domicilio completo para notificaciones]</p>
-        <p><strong>Correo de contacto:</strong> [PENDIENTE: correo@dominio.com]</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>2. Datos personales que recabamos</h2>
-        <p>Recabamos únicamente los datos necesarios para atender solicitudes de contacto y cotización:</p>
-        <ul>
-            <li>Nombre completo</li>
-            <li>Correo electrónico</li>
-            <li>Nombre del negocio, banda o proyecto</li>
-            <li>Servicio de interés</li>
-            <li>Presupuesto aproximado (opcional)</li>
-            <li>Descripción del proyecto</li>
-            <li>Fecha estimada (opcional)</li>
-            <li>Medio preferido de contacto (opcional)</li>
-        </ul>
-        <p>No recabamos datos sensibles (origen racial o étnico, salud, información genética, creencias religiosas, opinión política, preferencia sexual, etc.).</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>3. Finalidades del tratamiento</h2>
-        <h3>Finalidades primarias (necesarias para la relación):</h3>
-        <ul>
-            <li>Responder a solicitudes de información y cotización</li>
-            <li>Comunicarnos para entender los requerimientos del proyecto</li>
-            <li>Enviar propuestas comerciales y presupuestos</li>
-            <li>Dar seguimiento a la relación comercial si se formaliza</li>
-        </ul>
-        <h3>Finalidades secundarias (requieren consentimiento):</h3>
-        <ul>
-            <li>Envío de newsletter o comunicaciones comerciales</li>
-            <li>Inclusión en directorio de clientes</li>
-        </ul>
-    </article>
-
-    <article class="privacy-section">
-        <h2>4. Transferencias de datos</h2>
-        <p>No transferimos tus datos personales a terceros, excepto:</p>
-        <ul>
-            <li>Cuando sea requerido por autoridad competente con fundamento legal</li>
-            <li>Proveedores de servicios tecnológicos necesarios (hosting, email, formularios) bajo contratos de confidencialidad</li>
-        </ul>
-        <p>No vendemos, alquilamos ni compartimos tus datos con fines publicitarios de terceros.</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>5. Derechos ARCO</h2>
-        <p>Tienes derecho a:</p>
-        <ul>
-            <li><strong>Acceso:</strong> conocer qué datos personales tenemos de ti</li>
-            <li><strong>Rectificación:</strong> corregir datos inexactos o incompletos</li>
-            <li><strong>Cancelación:</strong> solicitar la eliminación de tus datos</li>
-            <li><strong>Oposición:</strong> oponerte al tratamiento para fines específicos</li>
-        </ul>
-        <h3>Cómo ejercer tus derechos:</h3>
-        <p>Envía una solicitud por escrito a <code>[PENDIENTE: correo@dominio.com]</code> con:</p>
-        <ul>
-            <li>Tu nombre completo</li>
-            <li>Copia de identificación oficial</li>
-            <li>Descripción clara del derecho que deseas ejercer</li>
-            <li>Cualquier documento que facilite la localización de tus datos</li>
-        </ul>
-        <p>Responderemos en un plazo máximo de 20 días hábiles según la LFPDPPP.</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>6. Revocación del consentimiento</h2>
-        <p>Puedes revocar tu consentimiento en cualquier momento enviando una solicitud al correo indicado. La revocación no tendrá efectos retroactivos.</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>7. Uso de cookies y tecnologías similares</h2>
-        <p>Este sitio no instala cookies de análisis ni de publicidad. El formulario se procesa mediante un proveedor externo cuando se habilita el envío.</p>
-        <p>Puedes configurar tu navegador para bloquear o eliminar cookies.</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>8. Seguridad de la información</h2>
-        <p>Implementamos medidas razonables para proteger tus datos:</p>
-        <ul>
-            <li>Comunicación cifrada mediante HTTPS/TLS</li>
-            <li>Validación de datos en el navegador</li>
-            <li>Campo honeypot anti-spam</li>
-            <li>Acceso restringido a datos solo a personal autorizado</li>
-        </ul>
-    </article>
-
-    <article class="privacy-section">
-        <h2>9. Conservación de datos</h2>
-        <ul>
-            <li>Datos de formulario de contacto: 12 meses después del último contacto</li>
-            <li>Datos de clientes activos: duración de la relación + 5 años (requisitos fiscales)</li>
-            <li>Logs de seguridad: 90 días</li>
-        </ul>
-    </article>
-
-    <article class="privacy-section">
-        <h2>10. Cambios al aviso de privacidad</h2>
-        <p>Nos reservamos el derecho de modificar este aviso. Las versiones actualizadas se publicarán en esta URL con fecha de actualización.</p>
-    </article>
-
-    <article class="privacy-section">
-        <h2>11. Contacto para dudas y ejercicios de derechos</h2>
-        <ul>
-            <li><strong>Correo:</strong> [PENDIENTE: correo@dominio.com]</li>
-            <li><strong>Responsable de protección de datos:</strong> [PENDIENTE: nombre]</li>
-            <li><strong>Domicilio:</strong> [PENDIENTE: domicilio completo]</li>
-        </ul>
-    </article>
-
-    <div class="privacy-meta">
-        <p><strong>Última actualización:</strong> ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        <p><strong>Versión:</strong> 1.0</p>
-        <p><strong>Debes completar este aviso con asesoría legal antes de poner el sitio en producción.</strong></p>
+    <div class="container">
+        <div class="privacy-notice">
+            <strong>⚠ Aviso importante:</strong> Este aviso contiene campos marcados con <code>[PENDIENTE]</code> que deben completarse con asesoría legal antes de publicar en producción. Consulta la LFPDPPP (México).
+        </div>
+        
+        <article class="privacy-section">
+            <h2>1. Identidad y domicilio del responsable</h2>
+            <p><strong>Responsable:</strong> ${e(studioName)}</p>
+            <p><strong>Domicilio:</strong> [PENDIENTE: Domicilio completo para notificaciones]</p>
+            <p><strong>Correo de contacto:</strong> [PENDIENTE: correo@dominio.com]</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>2. Datos personales que recabamos</h2>
+            <p>El formulario solicita únicamente los datos necesarios para atender consultas y cotizaciones. Mientras no se configure un endpoint, el sitio no envía esos datos. Si se activa el newsletter, también se solicitará un correo electrónico.</p>
+            <ul>
+                <li>Nombre completo</li>
+                <li>Correo electrónico</li>
+                <li>Nombre del negocio, banda o proyecto</li>
+                <li>Servicio de interés</li>
+                <li>Presupuesto aproximado (opcional)</li>
+                <li>Descripción del proyecto</li>
+                <li>Fecha estimada (opcional)</li>
+                <li>Medio preferido de contacto (opcional)</li>
+            </ul>
+            <p>No recabamos datos sensibles (origen racial o étnico, salud, información genética, creencias religiosas, opinión política, preferencia sexual, etc.).</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>3. Finalidades del tratamiento</h2>
+            <h3>Finalidades primarias (necesarias para la relación):</h3>
+            <ul>
+                <li>Responder a solicitudes de información y cotización</li>
+                <li>Comunicarnos para entender los requerimientos del proyecto</li>
+                <li>Enviar propuestas comerciales y presupuestos</li>
+                <li>Dar seguimiento a la relación comercial si se formaliza</li>
+            </ul>
+            <h3>Finalidades secundarias (requieren consentimiento):</h3>
+            <ul>
+                <li>Envío de newsletter o comunicaciones comerciales</li>
+                <li>Inclusión en directorio de clientes</li>
+            </ul>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>4. Transferencias de datos</h2>
+            <p>Cuando se configure un endpoint de formularios, el proveedor que lo procese recibirá los datos enviados. Deben completarse aquí su identidad, condiciones y medidas aplicables antes de activar los envíos.</p>
+            <ul>
+                <li>Cuando sea requerido por autoridad competente con fundamento legal</li>
+                <li>Proveedores de servicios tecnológicos necesarios, conforme a sus avisos y acuerdos aplicables</li>
+            </ul>
+            <p>No se afirma que un proveedor externo esté configurado actualmente.</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>5. Derechos ARCO</h2>
+            <p>Tienes derecho a:</p>
+            <ul>
+                <li><strong>Acceso:</strong> Conocer qué datos personales tenemos de ti</li>
+                <li><strong>Rectificación:</strong> Corregir datos inexactos o incompletos</li>
+                <li><strong>Cancelación:</strong> Solicitar la eliminación de tus datos</li>
+                <li><strong>Oposición:</strong> Oponerte al tratamiento para fines específicos</li>
+            </ul>
+            <h3>Cómo ejercer tus derechos:</h3>
+            <p>Envía una solicitud por escrito a <code>[PENDIENTE: correo@dominio.com]</code> con:</p>
+            <ul>
+                <li>Tu nombre completo</li>
+                <li>Copia de identificación oficial</li>
+                <li>Descripción clara del derecho que deseas ejercer</li>
+                <li>Cualquier documento que facilite la localización de tus datos</li>
+            </ul>
+            <p>Responderemos en un plazo máximo de 20 días hábiles según la LFPDPPP.</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>6. Revocación del consentimiento</h2>
+            <p>Puedes revocar tu consentimiento en cualquier momento enviando una solicitud al correo indicado. La revocación no tendrá efectos retroactivos.</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>7. Uso de cookies y tecnologías similares</h2>
+            <p>El sitio no integra actualmente herramientas propias de analítica ni una plataforma de gestión de cookies. Verifica los servicios de hosting y formularios que se configuren antes de publicar este aviso.</p>
+            <ul>
+                <li><strong>Servicios externos:</strong> Sus tecnologías y cookies deberán documentarse si se añaden o activan.</li>
+            </ul>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>8. Seguridad de la información</h2>
+            <p>Este sitio estático no almacena solicitudes en un servidor propio. La protección y el tratamiento del envío dependerán del hosting y del proveedor de formularios que se configure.</p>
+            <ul>
+                <li>El formulario aplica validación en el navegador; el proveedor deberá validar también los datos recibidos.</li>
+                <li>Incluye un campo honeypot, que no sustituye controles del proveedor.</li>
+                <li>La disponibilidad de HTTPS depende de la configuración de GitHub Pages.</li>
+            </ul>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>9. Conservación de datos</h2>
+            <ul>
+                <li>Datos enviados por formularios: [PENDIENTE: proveedor y plazo de conservación aplicable]</li>
+                <li>Datos asociados a una relación comercial: [PENDIENTE: definir plazos con asesoría legal]</li>
+                <li>Registros del hosting y de formularios: [PENDIENTE: confirmar políticas de cada proveedor]</li>
+            </ul>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>10. Cambios al aviso de privacidad</h2>
+            <p>Nos reservamos el derecho de modificar este aviso. Las versiones actualizadas se publicarán en esta URL con fecha de actualización.</p>
+        </article>
+        
+        <article class="privacy-section">
+            <h2>11. Contacto para dudas y ejercicios de derechos</h2>
+            <ul>
+                <li><strong>Correo:</strong> [PENDIENTE: correo@dominio.com]</li>
+                <li><strong>Responsable de protección de datos:</strong> [PENDIENTE: Nombre]</li>
+                <li><strong>Domicilio:</strong> [PENDIENTE: Domicilio completo]</li>
+            </ul>
+        </article>
+        
+        <div class="privacy-meta">
+            <p><strong>Última actualización:</strong> ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p><strong>Versión:</strong> 1.0</p>
+            <p><strong>Debes completar este aviso con asesoría legal antes de poner el sitio en producción.</strong></p>
+        </div>
     </div>
 </section>
 `;
@@ -1651,7 +1649,8 @@ function generateSitemap() {
         { url: `${SITE_URL}${asset('/proyectos/')}`, changefreq: 'weekly', priority: 0.8 },
         { url: `${SITE_URL}${asset('/servicios/')}`, changefreq: 'monthly', priority: 0.8 },
         { url: `${SITE_URL}${asset('/estudio/')}`, changefreq: 'monthly', priority: 0.6 },
-        { url: `${SITE_URL}${asset('/contacto/')}`, changefreq: 'yearly', priority: 0.5 }
+        { url: `${SITE_URL}${asset('/contacto/')}`, changefreq: 'yearly', priority: 0.5 },
+        { url: `${SITE_URL}${asset('/privacidad/')}`, changefreq: 'yearly', priority: 0.3 }
     ];
 
     for (const project of publishedProjects) {

@@ -47,44 +47,46 @@
     const initMobileNav = () => {
         const toggle = $('.nav-toggle');
         const navList = $('.nav-list');
+        const nav = $('.main-nav');
         const body = document.body;
+        const mobileBreakpoint = 860;
 
-        if (!toggle || !navList) return;
+        if (!toggle || !navList || !nav) return;
 
         const openMenu = () => {
             toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', 'Cerrar menú');
             navList.classList.add('nav-list--open');
             body.style.overflow = 'hidden';
-            
-            setTimeout(() => {
-                const firstLink = navList.querySelector('a');
-                if (firstLink) firstLink.focus();
-            }, 100);
+            navList.querySelector('a')?.focus();
         };
 
         const closeMenu = () => {
             toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Abrir menú');
             navList.classList.remove('nav-list--open');
             body.style.overflow = '';
         };
 
         const handleKeydown = (e) => {
-            if (e.key === 'Escape') {
+            const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+
+            if (e.key === 'Escape' && isOpen) {
                 closeMenu();
                 toggle.focus();
             }
             
-            if (e.key === 'Tab' && navList.classList.contains('nav-list--open')) {
+            if (e.key === 'Tab' && isOpen) {
                 const focusableElements = navList.querySelectorAll(
                     'a[href], button, [tabindex]:not([tabindex="-1"])'
                 );
                 const firstElement = focusableElements[0];
                 const lastElement = focusableElements[focusableElements.length - 1];
                 
-                if (e.shiftKey && document.activeElement === firstElement) {
+                if (firstElement && e.shiftKey && document.activeElement === firstElement) {
                     e.preventDefault();
                     lastElement.focus();
-                } else if (!e.shiftKey && document.activeElement === lastElement) {
+                } else if (lastElement && !e.shiftKey && document.activeElement === lastElement) {
                     e.preventDefault();
                     firstElement.focus();
                 }
@@ -105,12 +107,19 @@
             link.addEventListener('click', closeMenu);
         });
 
+        // Close on click outside the navigation
+        document.addEventListener('click', (e) => {
+            if (toggle.getAttribute('aria-expanded') === 'true' && !nav.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
         // Keyboard handling
         document.addEventListener('keydown', handleKeydown);
 
         // Handle resize
         const handleResize = debounce(() => {
-            if (window.innerWidth > 860 && navList.classList.contains('nav-list--open')) {
+            if (window.innerWidth > mobileBreakpoint && toggle.getAttribute('aria-expanded') === 'true') {
                 closeMenu();
             }
         }, 250);
@@ -351,8 +360,19 @@
             norm(option.value) === norm(wanted) || norm(option.textContent) === norm(wanted)
         );
 
-        if (match && match.value) {
-            select.value = match.value;
+        // Respaldo: si llega un id de servicio, mapea a su categoría
+        // (serviceCategories lo aporta config.js cuando el build lo incluye).
+        let target = match?.value;
+        if (!target && CONFIG.serviceCategories) {
+            const category = CONFIG.serviceCategories[wanted];
+            const byCategory = Array.from(select.options).find(option =>
+                category && norm(option.value) === norm(category)
+            );
+            if (byCategory) target = byCategory.value;
+        }
+
+        if (target) {
+            select.value = target;
             select.setAttribute('aria-invalid', 'false');
         }
     };
@@ -420,9 +440,11 @@
                 }
                 
                 errorEl.textContent = field.validationMessage;
+                field.setAttribute('aria-describedby', errorId);
                 return false;
             } else {
                 field.setAttribute('aria-invalid', 'false');
+                field.removeAttribute('aria-describedby');
                 if (errorEl) {
                     errorEl.remove();
                 }
@@ -520,6 +542,7 @@
                                     field.parentNode.appendChild(errorEl);
                                 }
                                 errorEl.textContent = message;
+                                field.setAttribute('aria-describedby', `${fieldName}-error`);
                             }
                         });
                     }
