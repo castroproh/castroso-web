@@ -2432,6 +2432,10 @@ textarea.form-input { resize: vertical; min-height: 140px; }
 .studio-story-mark span:nth-child(2) { color: var(--azul); -webkit-text-stroke: 0; }
 .studio-story-mark span:nth-child(3) { color: var(--rojo); -webkit-text-stroke: 0; }
 
+@media (min-width: 1025px) and (max-width: 1360px) {
+    .studio-story-mark span { font-size: clamp(1.6rem, 3.2vw, 3.2rem); }
+}
+
 .studio-team { padding-block: clamp(3rem, 6.5vw, 6.5rem); }
 
 .team-profiles {
@@ -2457,6 +2461,29 @@ textarea.form-input { resize: vertical; min-height: 140px; }
 .team-profile-media { position: relative; }
 
 .team-profile-portrait .portrait-media img { aspect-ratio: 4 / 5; }
+
+.container,
+.hero-grid,
+.hero-portraits,
+.studio-diptych,
+.team-profile-media,
+.portrait,
+.portrait-media,
+.portrait-media img {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.portrait-media {
+    display: block;
+    width: 100%;
+}
+
+.portrait-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
 
 .team-profile-index {
     position: absolute;
