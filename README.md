@@ -2,43 +2,41 @@
 
 Sitio web del estudio creativo CASTROSO.JPG (Culiacán, Sinaloa, México) convertido a sitio estático compatible con GitHub Pages.
 
+> **Rediseño 2026:** dirección de arte editorial completa, sistema visual reconstruido en CSS plano, portada tipo publicación, portafolio con filtros/paginación/detalle, servicios como filas editoriales y accesibilidad/SEO reforzados. Ver `INFORME_REDISENO.md`.
+
 ## 🎨 Identidad Visual
 
 - **Paleta oficial**: Negro carbón (`#08090B`), Blanco papel (`#F2F0EA`), Azul eléctrico (`#145BFF`), Rojo intenso (`#E52B35`), Verde oscuro (`#187A50`), Gris fotocopia (`#777777`)
-- **Tipografía**: Sora (principal) + JetBrains Mono (técnica) — archivos WOFF2 locales
+- **Tipografía**: Sora (display/texto) + JetBrains Mono (etiquetas/metadatos) — archivos WOFF2 locales
 - **Logotipos**: Isotipo, Logotipo, Imagotipo horizontal/vertical, Monograma (SVG oficiales)
-- **Estilo**: Indie Experimental + Cyber Retro + Diseño Editorial + Underground
+- **Estilo**: Indie Experimental + Editorial + Underground + Diseño de autor
 
 ## 📁 Estructura del Proyecto
 
 ```
-castroso-static/
-├── src/                    # Código fuente (templates, partials, estilos)
-├── public/                 # Assets estáticos
-│   ├── assets/
-│   │   ├── css/main.css    # Estilos completos (design tokens, componentes, páginas)
-│   │   ├── js/main.js      # JS vanilla (nav, filtros, lightbox, formularios, animaciones)
-│   │   ├── fonts/          # Sora + JetBrains Mono (WOFF2)
-│   │   ├── logos/          # SVGs oficiales organizados por variante
-│   │   ├── icons/          # Favicons generados (16, 32, 48, 180, 192, 512, SVG)
-│   │   └── images/         # OG default, proyectos, patrones gráficos
-├── data/                   # Contenido en JSON
-│   ├── site.json           # Configuración del sitio, studio, SEO, navegación
-│   ├── projects.json       # Portafolio (proyectos, categorías, metadata)
-│   └── services.json       # Servicios (3 categorías, 13 servicios)
+castroso-web/
+├── data/                    # Contenido en JSON
+│   ├── site.json            # Configuración, estudio, equipo, SEO, navegación, contacto
+│   ├── projects.json        # Portafolio (proyectos, categorías, metadata)
+│   └── services.json        # Servicios (3 categorías, 13 servicios)
+├── public/                  # Assets estáticos (se copian a dist/)
+│   └── assets/
+│       ├── css/main.css     # Sistema visual completo (tokens, componentes, páginas)
+│       ├── js/main.js       # JS vanilla (nav, filtros, lightbox, formularios, animaciones)
+│       ├── fonts/           # Sora + JetBrains Mono (WOFF2) + licencias OFL
+│       ├── logos/           # SVG oficiales por variante
+│       ├── icons/           # Favicons (16, 32, 48, 180, 192, 512, SVG)
+│       └── images/          # OG default, proyectos, paleta, sistema gráfico, patrón
 ├── scripts/
-│   ├── build.mjs           # Generador de sitio estático principal
-│   ├── generate-favicons.mjs    # Genera favicons desde isotipo SVG
-│   ├── generate-og.mjs          # Genera imagen OG (1200×630)
-│   └── generate-project-images.mjs # Placeholders para proyectos
-├── dist/                   # Salida de build (se publica en GitHub Pages)
+│   ├── build.mjs            # Generador del sitio estático
+│   ├── generate-favicons.mjs
+│   ├── generate-og.mjs
+│   └── generate-project-images.mjs
 ├── .github/workflows/
-│   └── deploy.yml          # GitHub Actions para deploy automático
-├── package.json
-├── .gitignore
-├── .nojekyll
-├── CNAME                   # (opcional) Dominio personalizado
-└── README.md
+│   └── deploy.yml           # GitHub Actions → GitHub Pages
+├── dist/                    # Salida del build (se publica)
+├── INFORME_REDISENO.md      # Informe del rediseño
+└── package.json
 ```
 
 ## 🚀 Instalación y Desarrollo Local
@@ -220,6 +218,8 @@ El script `scripts/build.mjs`:
 
 ## 📋 Datos Pendientes (Antes de Producción)
 
+> Detalle completo con efectos y ubicación en código: **`PENDIENTES_PUBLICACION.md`**.
+
 ### Legales (`privacidad/index.html` — campos `[PENDIENTE]`)
 - [ ] Domicilio completo para notificaciones
 - [ ] Correo de contacto legal
@@ -234,13 +234,12 @@ El script `scripts/build.mjs`:
 - [ ] Crear formulario contacto → `FORMSPREE_ENDPOINT`
 - [ ] Crear formulario newsletter → `NEWSLETTER_ENDPOINT` (opcional)
 
-### Imágenes de proyectos reales
+### Imágenes de proyectos (opcional)
 
-Los dos proyectos de ejemplo (`identidad-castroso`, `sistema-editorial`) están marcados como **borradores** (`"published": false`) porque sus imágenes son gráficos generados (`scripts/generate-project-images.mjs`), no fotografías definitivas. No aparecen públicamente.
+Los dos proyectos (`identidad-castroso`, `sistema-editorial`) están publicados y usan sus **SVG originales** (`media_type: "vector"`, `fit: "contain"`). Las imágenes JPG generadas fueron eliminadas; `scripts/generate-project-images.mjs` está marcado DEPRECATED y sólo corre con `FORCE_PLACEHOLDERS=1`.
 
-- [ ] Reemplazar placeholders en `public/assets/images/projects/[slug]/` con fotos reales (cover, 01.jpg..., og.jpg)
-- [ ] Actualizar `projects.json` con `cover`, `gallery[]`, `meta.og_image` reales
-- [ ] Marcar proyectos reales con `"published": true` para que se generen y publiquen
+- [ ] (Opcional) Sustituir por fotos/mockups reales y actualizar `cover`, `gallery[]` y `meta.og_image` en `projects.json`
+- [ ] Si algún proyecto deja de ser público, poner `"published": false`
 
 ### Dominio
 - [ ] Configurar DNS para `castroso.jpg`
@@ -248,6 +247,9 @@ Los dos proyectos de ejemplo (`identidad-castroso`, `sistema-editorial`) están 
 - [ ] Verificar `CNAME` en repo
 
 ## 🧪 Testing Checklist
+
+> **Verificado en la auditoría 2026-11-17** (Node v26.8.1, Chrome headless):
+> `npm ci` (exit 0, 0 vulnerabilidades), `npm run build` (10 HTML + sitemap/robots/manifest/.nojekyll), `npm run preview` (200 en `/` y assets), enlaces locales (353 refs, 0 rotos), fuentes Sora/JetBrains Mono cargan, menú móvil (abre/cierra, overlay, Escape), filtros + URL sync, validación de contacto y mensaje sin endpoint (no simula éxito), newsletter muestra aviso, páginas de proyecto con SVG `contain`, 0 overflow horizontal y 0 texto recortado en 5 anchos (375–1920).
 
 ### Build
 - [ ] `npm ci` + `npm run build` → `dist/` generado sin errores
@@ -271,7 +273,7 @@ Los dos proyectos de ejemplo (`identidad-castroso`, `sistema-editorial`) están 
 - [ ] Logos SVG escalan correctamente
 - [ ] Favicons en `/assets/icons/`
 - [ ] OG image 1200×630 en `/assets/images/og-default.jpg`
-- [ ] Imágenes proyectos en `/assets/images/projects/[slug]/`
+- [ ] Imágenes proyectos: SVG originales servidos y renderizados con `object-fit: contain`
 
 ### JavaScript
 - [ ] Menú móvil abre/cierra (teclado + click outside + resize)
@@ -304,8 +306,6 @@ Los dos proyectos de ejemplo (`identidad-castroso`, `sistema-editorial`) están 
 
 Código: MIT — Identidad visual: propiedad de CASTROSO.JPG (SVG oficiales sin modificar).
 Tipografías: Sora y JetBrains Mono bajo SIL Open Font License 1.1 (ver `public/assets/fonts/LICENSE-*.txt`).
-
-## 🤝 Créditos
 
 ## 🤝 Créditos
 

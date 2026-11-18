@@ -1,12 +1,25 @@
 #!/usr/bin/env node
 /**
- * Genera imágenes placeholder para proyectos
+ * DEPRECATED — NO usar en producción.
+ *
+ * Genera diapositivas placeholder (no fotografías ni mockups) para proyectos.
+ * El sitio ahora presenta los archivos vectoriales originales del sistema de
+ * identidad (logos, paleta, patrón) en lugar de estas imágenes generadas.
+ *
+ * Uso: FORCE_PLACEHOLDERS=1 node scripts/generate-project-images.mjs
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp';
+
+if (process.env.FORCE_PLACEHOLDERS !== '1') {
+    console.warn('🛑 generate-project-images está deprecado y no genera nada por seguridad.');
+    console.warn('   El sitio usa los recursos vectoriales originales. Si realmente necesitas');
+    console.warn('   placeholders, ejecuta: FORCE_PLACEHOLDERS=1 node scripts/generate-project-images.mjs');
+    process.exit(0);
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');

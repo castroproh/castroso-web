@@ -6,6 +6,8 @@
 **Entorno:** Node v26.8.1, npm 11.19.0  
 **Estado:** Producción-ready (páginas estáticas, sin backend)
 
+> **Nota:** este informe corresponde a una auditoría anterior. Para el rediseño integral y el estado actual del sitio, ver `INFORME_REDISENO.md`.
+
 ---
 
 ## 1. Resumen ejecutivo
@@ -114,9 +116,9 @@ Comando: `npm run build` (Node 26.8.1, `npm ci` previo OK)
 ## 7. Notas técnicas
 
 - No se comitea ningún `CNAME` ni `.env`. Los secretos (`FORMSPREE_ENDPOINT`, `NEWSLETTER_ENDPOINT`) van solo en GitHub Actions Secrets.
-- `npm run preview` usa `npx serve` que falló en Node 26 con `--listen`; usar `./node_modules/.bin/serve dist -p <puerto>`.
+- `npm run preview` (`npx serve dist -p 3000`) funciona en Node v26.8.1 (verificado: `/` y `/assets/css/main.css` responden 200).
 - GitHub Pages como **sitio de usuario/organización** (`usuario.github.io`): `BASE_PATH=`. Como **proyecto** (`usuario.github.io/repo/`): `BASE_PATH=/repositorio/` y `SITE_URL=https://usuario.github.io`.
-- Ambos proyectos de ejemplo siguen como borrador; no generan páginas `/proyectos/[slug]/` hasta marcarse `"published": true` con imágenes reales.
+- Estado posterior al rediseño: ambos proyectos están marcados `"published": true` y generan `/proyectos/[slug]/`; sus imágenes generadas fueron eliminadas y se usan los SVG originales. Ver `INFORME_REDISENO.md` y `PENDIENTES_PUBLICACION.md`.
 
 ---
 

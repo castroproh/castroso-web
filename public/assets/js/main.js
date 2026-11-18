@@ -6,6 +6,9 @@
 (() => {
     'use strict';
 
+    // Marca el documento como "JS activo" para animaciones de entrada seguras
+    document.documentElement.classList.add('js');
+
     // ==========================================================================
     // Configuración desde config.js
     // ==========================================================================
@@ -107,7 +110,7 @@
 
         // Handle resize
         const handleResize = debounce(() => {
-            if (window.innerWidth > 768 && navList.classList.contains('nav-list--open')) {
+            if (window.innerWidth > 860 && navList.classList.contains('nav-list--open')) {
                 closeMenu();
             }
         }, 250);
@@ -299,27 +302,59 @@
     // ==========================================================================
 
     const initScrollAnimations = () => {
-        if (prefersReducedMotion()) {
-            $$('.animate-entrance').forEach(el => el.style.opacity = '1');
+        const targets = $$('.animate-entrance');
+
+        if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+            targets.forEach(el => el.classList.add('is-visible'));
             return;
         }
 
         const observerOptions = {
             root: null,
-            rootMargin: '0px 0px -10% 0px',
-            threshold: 0.1
+            rootMargin: '0px 0px -8% 0px',
+            threshold: 0.08
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
+                    entry.target.classList.add('is-visible');
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        $$('.animate-entrance').forEach(el => observer.observe(el));
+        targets.forEach(el => observer.observe(el));
+    };
+
+    // ==========================================================================
+    // Contact Form — Prefill desde ?servicio=
+    // ==========================================================================
+
+    const initContactPrefill = () => {
+        const form = $('#contact-form');
+        if (!form) return;
+
+        const wanted = new URLSearchParams(window.location.search).get('servicio');
+        if (!wanted) return;
+
+        const select = form.querySelector('select[name="servicio"]');
+        if (!select) return;
+
+        const norm = (value) => String(value)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+
+        const match = Array.from(select.options).find(option =>
+            norm(option.value) === norm(wanted) || norm(option.textContent) === norm(wanted)
+        );
+
+        if (match && match.value) {
+            select.value = match.value;
+            select.setAttribute('aria-invalid', 'false');
+        }
     };
 
     // ==========================================================================
@@ -430,21 +465,21 @@
                 return;
             }
 
+            // Sin endpoint real no se envía nada: se informa que no está disponible
+            const endpoint = CONFIG.formspreeEndpoint;
+            if (!endpoint) {
+                showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
+                return;
+            }
+
             setLoading(true);
 
             try {
                 const formData = new FormData(form);
-                
+
                 // Remove honeypot from submission
                 if (CONFIG.contact?.honeypot_field) {
                     formData.delete(CONFIG.contact.honeypot_field);
-                }
-
-                // Use Formspree endpoint if configured
-                const endpoint = CONFIG.formspreeEndpoint || form.action;
-                
-                if (!endpoint) {
-                    throw new Error('No endpoint configured');
                 }
 
                 const response = await fetch(endpoint, {
@@ -493,7 +528,7 @@
                 console.error('Form submission error:', error);
                 
                 if (!CONFIG.formspreeEndpoint) {
-                    showMessage('warning', 'El formulario está en modo demo. Configura FORMSPREE_ENDPOINT para activar envíos reales. Puedes contactarnos por Instagram o correo.');
+                    showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
                 } else {
                     showMessage('error', 'Error de conexión. Inténtalo de nuevo o escríbenos directamente por Instagram.');
                 }
@@ -516,8 +551,13 @@
         const endpoint = CONFIG.newsletterEndpoint;
 
         if (!endpoint) {
-            // Disable if no endpoint
-            form.innerHTML = '<p class="form-disclaimer">Suscríbete a nuestro newsletter próximamente. Síguenos en <a href="' + CONFIG.studio?.instagram + '" target="_blank" rel="noopener">Instagram</a> mientras tanto.</p>';
+            // No hay integración real: se informa y no se simula suscripción
+            const ig = CONFIG.studio?.instagram;
+            form.innerHTML = '<p class="form-disclaimer">La suscripción al newsletter todavía no está habilitada. ' +
+                (ig
+                    ? 'Síguenos en <a href="' + ig + '" target="_blank" rel="noopener noreferrer">Instagram</a> mientras tanto.'
+                    : 'Vuelve pronto.') +
+                '</p>';
             return;
         }
 
@@ -787,6 +827,7 @@
         initHeaderScroll();
         initProjectFilters();
         initScrollAnimations();
+        initContactPrefill();
         initContactForm();
         initNewsletterForm();
         initGalleryLightbox();
