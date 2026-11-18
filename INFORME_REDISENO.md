@@ -185,4 +185,36 @@ Para probar la subruta exacta, sirve el directorio padre de `dist/` de modo que 
 
 ---
 
+## 11. Fase 2 — Corrección de maquetación sobre la versión publicada (2026-11-17)
+
+Tras publicar la fase 1 se detectaron en navegador real los defectos que motivaron esta segunda intervención: textos concatenados ("01Inicio", "Diseño gráficoDirección de arte…"), marquee desordenado, tarjetas de proyecto aparentemente vacías, composición desequilibrada en Estudio y footer con listas básicas.
+
+**Diagnóstico verificado:** el `build.mjs` reescrito en fase 1 generaba el marcado nuevo, pero `public/assets/css/main.css` seguía siendo el de la iteración anterior — **ninguna** de las clases nuevas (`topbar`, `hero-grid`, `hero-portraits`, `portrait-media`, `ticker`, `manifesto-*`, `discipline-row`, `studio-*`, `team-profile*`, `case-*`, `service-chapter`, `page-hero-top/bottom`, `footer-top`, etc.) tenía regla CSS. El sitio compilaba pero no estaba maquetado.
+
+### 11.1 Correcciones implementadas
+
+| Defecto | Causa raíz | Corrección |
+|---------|-----------|------------|
+| Textos concatenados | Sin reglas para `.nav-index`, `.kicker-index`, `.hero-disciplines`, `.discipline-row`, `.page-hero-top`, `.project-card-top`, etc. | Reescritura completa de `main.css` (≈3.300 líneas) con retícula, `gap` y separadores por componente; auditado clase por clase contra el HTML generado (0 clases sin regla). |
+| Marquee desordenado | `.ticker-track` / `.footer-marquee-track` sin estilos (los del diseño anterior apuntaban a `.marquee-*`). | Cinta con `overflow:hidden`, pista duplicada al 50%, separadores `<i>` propios entre términos, `prefers-reduced-motion` respetado. |
+| Tarjetas "vacías" | `.project-card-media` sin altura ni fondo; los SVG caían a altura 0. | Media con `aspect-ratio` y panel de retícula; SVG con `object-fit: contain` (regla `.project-card--contain`), índice y etiqueta posicionados. |
+| Paginación visible con 2 proyectos | `.pagination { display:flex }` anulaba el atributo `[hidden]` del HTML. | Reset global `[hidden] { display:none !important }`. |
+| Lightbox roto (navegaba al SVG) | `main.js` bindeaba el click al `<img>` y no hacía `preventDefault` en el `<a class="gallery-link">`. | Bind al enlace con `preventDefault`; el cover dejó de contar como slide; se eliminó el `<style>` inline que pisaba el diseño. |
+| Leyendas de retrato partidas ("RETRATO / SANTIEL") | `figcaption` sin control de envoltura. | Primer dato inquebrantable; la función envuelve solo en límite de palabra; la fila se apila cuando no cabe. |
+| Grid de historia desalineado (Estudio) | El riel (`section-rail`) está fuera de `.studio-story-grid`; la plantilla le asignaba su columna. | Plantilla de 3 columnas real (título / texto / bloque CREA·EXPERIMENTA·COMPARTE) y `padding-bottom` del hero de estudio. |
+| Desbordes horizontales | — | Auditoría automatizada con iframe de 375–1440 px en las 7 páginas: `scrollWidth = viewport` en todos los casos; los únicos elementos anchos son los marquees, recortados por diseño. |
+
+### 11.2 Validación (fase 2)
+
+- `npm ci` + `npm run build`: 10 HTML + 2 detalles + `sitemap.xml` + `robots.txt`, rutas `/castroso-web/` correctas.
+- Consola sin errores y red sin 4xx/5xx en las 7 páginas (Chromium).
+- Capturas reales en 375, 390, 520, 560, 640, 768, 860, 1024, 1280, 1366 y 1440 px (portada, estudio, proyectos, detalle, servicios, contacto, privacidad) vía Chrome headless + sonda de iframe.
+- Interacciones verificadas: menú móvil (abre/cierra, `aria-expanded`, bloqueo de scroll), filtros, lightbox (abrir/navegar/cerrar), paginación oculta, prefill `?servicio=` del formulario.
+
+### 11.3 Pendiente de publicación
+
+Sin cambios respecto a la sección 9: datos reales faltantes (`studio.email`, `studio.whatsapp`, `FORMSPREE_ENDPOINT`, campos `[PENDIENTE]` del aviso, dominio propio).
+
+---
+
 **CASTROSO.JPG — CREA. EXPERIMENTA. COMPARTE.**

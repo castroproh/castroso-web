@@ -1,8 +1,8 @@
 # PENDIENTES DE PUBLICACIÓN — CASTROSO.JPG
 
-**Fecha:** 2026-11-17
+**Fecha:** 2026-11-17 (actualizado tras la fase 2 de maquetación)
 **Alcance:** datos que faltan para producción y que **no se han inventado** en el repositorio.
-**Estado actual:** sitio estático completo y funcional; sin estos datos, algunas funciones se omiten o muestran un aviso en lugar de simular éxito.
+**Estado actual:** sitio estático completo, maquetado y verificado (CSS alineado al HTML generado, QA en 11 anchos, interacciones y consola sin errores); sin estos datos, algunas funciones se omiten o muestran un aviso en lugar de simular éxito.
 
 ---
 

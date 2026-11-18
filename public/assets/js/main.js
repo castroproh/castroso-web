@@ -595,7 +595,8 @@
     // ==========================================================================
 
     const initGalleryLightbox = () => {
-        const galleryImages = $$('[data-lightbox] img, .project-cover img, .gallery-item img');
+        // Solo la galería: el cover ya se muestra en el encabezado del proyecto.
+        const galleryImages = $$('[data-lightbox] img, .gallery-item img');
         if (galleryImages.length === 0) return;
 
         let lightbox = null;
@@ -634,62 +635,6 @@
                 <div class="lightbox-counter"></div>
             `;
             document.body.appendChild(lightbox);
-
-            const style = document.createElement('style');
-            style.textContent = `
-                .lightbox {
-                    position: fixed;
-                    inset: 0;
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(8, 9, 11, 0.98);
-                    backdrop-filter: blur(10px);
-                    opacity: 0;
-                    visibility: hidden;
-                    transition: opacity 0.3s ease, visibility 0.3s ease;
-                }
-                .lightbox:not([hidden]) {
-                    opacity: 1;
-                    visibility: visible;
-                }
-                .lightbox-overlay { position: absolute; inset: 0; }
-                .lightbox-close,
-                .lightbox-prev,
-                .lightbox-next {
-                    position: absolute;
-                    width: 48px;
-                    height: 48px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(242, 240, 234, 0.05);
-                    border: 1px solid rgba(242, 240, 234, 0.1);
-                    border-radius: 50%;
-                    color: #F2F0EA;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    z-index: 10;
-                }
-                .lightbox-close { top: 24px; right: 24px; }
-                .lightbox-prev { left: 24px; top: 50%; transform: translateY(-50%); }
-                .lightbox-next { right: 24px; top: 50%; transform: translateY(-50%); }
-                .lightbox-close:hover { background: rgba(229, 43, 53, 0.2); border-color: #E52B35; color: #E52B35; }
-                .lightbox-prev:hover,
-                .lightbox-next:hover { background: rgba(20, 91, 255, 0.2); border-color: #145BFF; color: #145BFF; }
-                .lightbox-content { max-width: 90vw; max-height: 85vh; }
-                .lightbox-image { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
-                .lightbox-caption { text-align: center; margin-top: 16px; color: #777777; font-size: 0.875rem; }
-                .lightbox-counter { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: #777777; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
-                @media (max-width: 768px) {
-                    .lightbox-prev { left: 12px; width: 44px; height: 44px; }
-                    .lightbox-next { right: 12px; width: 44px; height: 44px; }
-                    .lightbox-close { top: 12px; right: 12px; width: 40px; height: 40px; }
-                }
-                @media (prefers-reduced-motion: reduce) { .lightbox { transition: none; } }
-            `;
-            document.head.appendChild(style);
 
             lightbox.querySelectorAll('[data-lightbox-close]').forEach(el => {
                 el.addEventListener('click', closeLightbox);
@@ -752,7 +697,17 @@
 
         galleryImages.forEach((img, index) => {
             img.style.cursor = 'zoom-in';
-            img.addEventListener('click', () => openLightbox(index));
+            const link = img.closest('a');
+            if (link) {
+                // Los enlaces de galería apuntan al recurso completo:
+                // se abre el lightbox en lugar de navegar fuera de la página.
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openLightbox(index);
+                });
+            } else {
+                img.addEventListener('click', () => openLightbox(index));
+            }
         });
     };
 

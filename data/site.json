@@ -23,7 +23,16 @@
                 "Desarrollo web",
                 "Diseño digital"
             ],
-            "description": "Diseñador gráfico y director de arte. Encargado de la identidad visual, el diseño editorial y el desarrollo digital del estudio."
+            "description": "Diseñador gráfico y director de arte. Encargado de la identidad visual, el diseño editorial y el desarrollo digital del estudio.",
+            "photo": {
+                "base": "/assets/images/equipo/mateo",
+                "widths": [480, 720, 960, 1200],
+                "width": 1200,
+                "height": 1500,
+                "focus": "50% 32%",
+                "alt": "Mateo, del estudio CASTROSO.JPG, con lentes y chamarra de mezclilla, sosteniendo un teléfono frente a un espejo.",
+                "caption": "Retrato / Mateo"
+            }
         },
         {
             "name": "Santiel",
@@ -31,12 +40,21 @@
                 "Fotografía",
                 "Grabación audiovisual"
             ],
-            "description": "Fotógrafo y productor audiovisual. Responsable de la captura de imagen, la grabación y la postproducción visual."
+            "description": "Fotógrafo y productor audiovisual. Responsable de la captura de imagen, la grabación y la postproducción visual.",
+            "photo": {
+                "base": "/assets/images/equipo/santiel",
+                "widths": [480, 720, 800],
+                "width": 800,
+                "height": 1000,
+                "focus": "50% 30%",
+                "alt": "Santiel, del estudio CASTROSO.JPG, con cabello ondulado y camiseta negra, sosteniendo un teléfono frente a un espejo.",
+                "caption": "Retrato / Santiel"
+            }
         }
     ],
     "seo": {
         "title": "CASTROSO.JPG — Estudio creativo independiente | Diseño, Fotografía, Audiovisual",
-        "description": "Estudio creativo independiente en Culiacán, Sinaloa. Diseño gráfico, fotografía, producción audiovisual y experimentación visual. CREA. EXPERIMENTA. COMPARTE.",
+        "description": "Estudio creativo independiente en Culiacán, Sinaloa. Diseño gráfico, dirección de arte, fotografía, producción audiovisual y diseño web. CREA. EXPERIMENTA. COMPARTE.",
         "keywords": "estudio creativo, diseño gráfico, fotografía, producción audiovisual, Culiacán, Sinaloa, identidad visual, diseño editorial, diseño independiente",
         "og_image": "/assets/images/og-default.jpg",
         "twitter_card": "summary_large_image"
