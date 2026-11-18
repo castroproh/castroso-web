@@ -11,17 +11,34 @@
             "published": true,
             "media_type": "vector",
             "fit": "contain",
-            "image_label": "Sistema vectorial de identidad visual",
-            "image_note": "Muestras vectoriales de los activos oficiales de marca; no son fotografías.",
-            "cover": "/assets/logos/Imagotipo/Imagotipo_horizontal_color.svg",
+            "image_label": "Piezas vectoriales",
+            "image_note": "Las piezas de este proyecto son los archivos vectoriales originales del sistema de identidad (imagotipo, isotipo, monograma, logotipo y paleta). No son fotografías de impresos ni mockups.",
+            "cover": "/assets/logos/Imagotipo/Imagotipo_vertical_color.svg",
             "gallery": [
+                "/assets/logos/Imagotipo/Imagotipo_horizontal_color.svg",
                 "/assets/logos/Isotipo/Isotipo_color.svg",
-                "/assets/logos/Logotipo/Logotipo_color.svg",
                 "/assets/logos/Monograma/Monograma_color.svg",
-                "/assets/images/Paleta_oficial.svg",
-                "/assets/images/Patron_derivado_del_isotipo.svg"
+                "/assets/logos/Logotipo/Logotipo_color.svg",
+                "/assets/images/Paleta_oficial.svg"
+            ],
+            "gallery_notes": [
+                "Imagotipo horizontal — versión principal",
+                "Isotipo — símbolo del estudio",
+                "Monograma — versión compacta",
+                "Logotipo — construcción tipográfica",
+                "Paleta oficial — seis colores"
             ],
             "description": "Diseño y desarrollo del sistema de identidad visual completo para CASTROSO.JPG. Incluye logotipo principal (imagotipo horizontal), isotipo, monograma, versiones monocromáticas, paleta cromática oficial, sistema gráfico editorial, patrón derivado del isotipo y aplicaciones de marca para web, redes sociales, papelería, fotografía y señalética.",
+            "summary": "Sistema de identidad completo: imagotipo, isotipo, monograma, paleta, tipografía y reglas de aplicación.",
+            "case_study": {
+                "intro": "CASTROSO.JPG necesitaba una identidad capaz de sostener tres disciplinas —diseño, fotografía y audiovisual— sin perder unidad. El concepto parte del propio nombre: un archivo .JPG como declaración de intención.",
+                "objective": "Construir un sistema de identidad flexible y reconocible para el estudio, con variantes suficientes para operar en impresión, pantalla y aplicaciones de marca sin perder coherencia.",
+                "concept": "La identidad parte de la idea del archivo vivo: una marca que se guarda, se comparte y se reproduce. El isotipo, el monograma y el imagotipo funcionan como variaciones de un mismo gesto gráfico.",
+                "visual_direction": "Sora para display y JetBrains Mono para metadatos; una paleta de seis colores; retícula editorial, líneas de separación y bloques cromáticos. Una estructura sobria con aplicaciones expresivas.",
+                "development": "Se definieron las variantes horizontal y vertical del imagotipo, el isotipo, el monograma, el logotipo y las versiones monocromáticas. Se establecieron proporciones, márgenes de respeto y criterios de uso a partir de los recursos vectoriales originales.",
+                "applications": "Web, redes sociales, papelería, señalética, fotografía y piezas editoriales. Las aplicaciones se apoyan en la paleta oficial y en el patrón derivado del isotipo.",
+                "result": "Un sistema de identidad documentado y utilizable, con recursos vectoriales originales y criterios suficientes para mantener la coherencia de la marca en distintos soportes."
+            },
             "credits": {
                 "direccion_arte": "Mateo",
                 "diseño_grafico": "Mateo",
@@ -45,14 +62,30 @@
             "published": true,
             "media_type": "vector",
             "fit": "contain",
-            "image_label": "Sistema gráfico editorial en formato vectorial",
-            "image_note": "La pieza muestra la retícula, el patrón y los recursos cromáticos del sistema; no es una fotografía.",
+            "image_label": "Especímenes del sistema",
+            "image_note": "Se muestran el sistema gráfico editorial y el patrón derivado del isotipo en sus archivos vectoriales originales. No son fotografías de piezas impresas.",
             "cover": "/assets/images/Sistema_grafico_editorial.svg",
             "gallery": [
                 "/assets/images/Patron_derivado_del_isotipo.svg",
-                "/assets/images/Paleta_oficial.svg"
+                "/assets/images/Paleta_oficial.svg",
+                "/assets/images/Sistema_grafico_editorial.svg"
+            ],
+            "gallery_notes": [
+                "Patrón derivado del isotipo",
+                "Paleta oficial — aplicación editorial",
+                "Sistema gráfico editorial — retícula y composición"
             ],
             "description": "Desarrollo del sistema gráfico editorial derivado de la identidad visual. Composiciones basadas en retículas, líneas de separación, bloques cromáticos, recortes tipográficos y recursos de impresión. Aplicado a carteles, papelería, encabezados web y piezas de comunicación.",
+            "summary": "Retículas, líneas, bloques cromáticos y tipografía experimental aplicados a piezas editoriales.",
+            "case_study": {
+                "intro": "El sistema editorial traduce la identidad de CASTROSO.JPG a una gramática de página: retículas, reglas, recortes tipográficos y color.",
+                "objective": "Desarrollar un conjunto de recursos editoriales que permitiera componer carteles, papelería, encabezados web y piezas de comunicación con una voz consistente.",
+                "concept": "La página como campo de experimentación. La estructura se mantiene reconocible mientras la tipografía y los bloques de color cambian de escala y posición.",
+                "visual_direction": "Retícula de doce columnas, líneas hairline, bloques de azul, rojo y verde, y titulares en Sora con tracking ajustado. JetBrains Mono aporta la capa técnica y los metadatos.",
+                "development": "Se construyeron especímenes de composición y un patrón derivado del isotipo. Las piezas se organizaron en variantes para impresión y pantalla, manteniendo el mismo sistema de márgenes y jerarquías.",
+                "applications": "Carteles, papelería, encabezados web, portadas y piezas de comunicación.",
+                "result": "Un sistema editorial abierto, con reglas claras y margen para la experimentación tipográfica."
+            },
             "credits": {
                 "direccion_arte": "Mateo",
                 "diseño_grafico": "Mateo"
