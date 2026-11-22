@@ -63,6 +63,9 @@ jobs:
           FORMSPREE_ENDPOINT: ${{ secrets.FORMSPREE_ENDPOINT }}
           NEWSLETTER_ENDPOINT: ${{ secrets.NEWSLETTER_ENDPOINT }}
 
+      - name: Verify generated site
+        run: npm run check
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
