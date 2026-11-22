@@ -2,9 +2,16 @@
 
 Sitio: CASTROSO.JPG — Dominio personalizado en GitHub Pages.
 
-**No actives el dominio en el workflow hasta tener acceso al registrador y poder configurar el DNS.** La variable `CUSTOM_DOMAIN` queda vacía para mantener el sitio en su URL actual.
+**Primero agrega el dominio en GitHub Pages y luego configura DNS.** GitHub recomienda este orden para reducir el riesgo de que otra persona pueda reclamar el dominio o un subdominio. Deja `CUSTOM_DOMAIN` vacía hasta completar estos pasos.
 
-## 1. Configurar DNS en el registrador
+## 1. Añadir el dominio en GitHub Pages
+
+1. Abre el repositorio `castroproh/castroso-web`.
+2. Ve a **Settings → Pages**.
+3. En **Custom domain**, escribe `castroso.jpg` y guarda.
+4. No actives todavía la variable `CUSTOM_DOMAIN`; primero configura los registros DNS que aparecen abajo.
+
+## 2. Configurar DNS en el registrador
 
 Para el dominio raíz `castroso.jpg`, crea estos cuatro registros:
 
@@ -23,16 +30,9 @@ Para `www.castroso.jpg`, crea:
 
 No borres otros registros que el proveedor use para correo u otros servicios sin comprobar antes para qué sirven.
 
-## 2. Añadir el dominio en GitHub Pages
+## 3. Verificar DNS y configurar el workflow
 
-1. Abre el repositorio `castroproh/castroso-web`.
-2. Ve a **Settings → Pages**.
-3. En **Custom domain**, escribe `castroso.jpg` y guarda.
-4. Espera a que GitHub verifique el DNS.
-
-## 3. Configurar el workflow para el dominio propio
-
-Después de configurar el DNS y agregar el dominio en Pages:
+Después de agregar el dominio en Pages y crear los registros DNS, espera la verificación de GitHub. Entonces:
 
 1. Ve a **Settings → Secrets and variables → Actions → Variables**.
 2. Crea una variable de repositorio:
