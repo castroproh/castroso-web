@@ -7,15 +7,19 @@ Todos los cambios notables al sitio y al repositorio se documentan aquí.
 ### Añadido
 - `@font-face` para Sora y JetBrains Mono (WOFF2 locales) con `font-display: swap` en `public/assets/css/main.css`. Evita FOIT y hace efectiva la precarga de fuentes existente en el HTML.
 - Atributo `aria-hidden="true"` en el isotipo decorativo del footer en `scripts/build.mjs`.
+- Sección "Cómo empezar" en la portada con 3 pasos para trabajar con el estudio (`scripts/build.mjs`, `public/assets/css/main.css`).
+- Pre-cotización de servicio específico: URL `?servicio_especifico=` desde tarjetas de servicio al formulario de contacto (`scripts/build.mjs`).
+- Pre-llenado de descripción en formulario de contacto cuando llega `servicio_especifico` por URL (`public/assets/js/main.js`).
 
 ### Modificado
-- `public/assets/css/main.css`: +22 líneas (tipografías locales).
-- `scripts/build.mjs`: +1 línea (accesibilidad isotipo footer).
+- `public/assets/css/main.css`: +22 líneas (tipografías locales) + estilos sección Cómo empezar.
+- `scripts/build.mjs`: +1 línea (accesibilidad isotipo footer) + CTA de contacto primario en hero + sección Cómo empezar + parámetro `servicio_especifico` en CTAs de servicio.
+- `public/assets/js/main.js`: `initContactPrefill` maneja `servicio_especifico` y pre-llena campo de descripción.
 - `.github/workflows/deploy.yml`: `node-version` de `'22'` a `'lts/*'` para coincidir con el entorno local (Node 26).
 
 ### Verificado
 - `npm run build`: 10 HTML generados (index, proyectos, servicios, estudio, contacto, privacidad, 404, 500, 2 proyectos).
-- `npm run check`: 454 referencias locales válidas, sitemap y robots correctos.
+- `npm run check`: 455 referencias locales válidas, sitemap y robots correctos.
 - `node --check`: sintaxis de `.mjs` y `.js` correcta.
 
 ### Pendiente (bloqueos comerciales — requiere datos del estudio)

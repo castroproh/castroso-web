@@ -179,11 +179,77 @@
 
 ---
 
-## 5. Próxima tarea recomendada
+## 5. Mejoras comerciales implementadas (FASE 4)
+
+| Mejora | Archivo | Descripción |
+|--------|---------|-------------|
+| CTA de contacto primario en hero | `scripts/build.mjs:699-702` | "Cuéntanos tu proyecto" es ahora btn-primary; "Ver el archivo" es link-arrow secundario |
+| Sección "Cómo empezar" | `scripts/build.mjs:829-860` | 3 pasos (Contacto → Propuesta → Producción) antes del CTA final |
+| CSS sección Cómo empezar | `public/assets/css/main.css` | Estilos para `.how-to-start`, `.steps-grid`, `.step`, `.step-num` con responsive |
+| Pre-cotización de servicio específico | `scripts/build.mjs:1075` | Pasa `servicio_especifico` en URL de contacto desde cada tarjeta de servicio |
+| Pre-llenado de descripción | `public/assets/js/main.js:343-392` | `initContactPrefill` rellena descripción con el servicio específico si viene por URL |
+
+---
+
+## 6. Medición de resultados (privacy-first)
+
+### Lo que se puede medir sin herramientas de terceros
+
+| Métrica | Fuente | Cómo obtenerla |
+|---------|--------|----------------|
+| Visitas por página | GitHub Pages / servidor | Logs de acceso del servidor o GitHub Pages analytics (si se activa) |
+| Páginas consultadas | Logs del servidor | Análisis de rutas en logs de acceso |
+| Servicios de interés | Parámetros URL `?servicio=` | Contar clicks en enlaces de servicio desde servicios/index.html |
+| Solicitudes de contacto | Envíos de formulario | Contar envíos exitosos vía Formspree (cuando esté configurado) |
+| Canales de contacto | Clicks en Instagram, mailto:, WhatsApp | Contar clicks en enlaces de salida del footer y página contacto |
+
+### Lo que requiere autorización del estudio
+
+- Google Analytics, Plausible, Fathom u otra herramienta de análisis web
+- Cookies de seguimiento o identificadores de usuario
+- Eventos de conversión personalizados (pixels de Meta, LinkedIn, etc.)
+
+### Enfoque propuesto
+
+1. **Sin cookies**: No se integran herramientas de análisis que instalen cookies sin consentimiento explícito.
+2. **Sin datos personales**: No se recopilan IPs completas, ubicaciones precisas ni datos de identificación.
+3. **Medición del lado del servidor**: Usar logs de acceso del servidor para conteo de páginas y referrers.
+4. **Conversiones honestas**: Contar solo envíos reales de formulario (no asumir éxito sin endpoint funcional).
+5. **Transparencia**: Documentar en el aviso de privacidad qué se mide y cómo.
+
+### Eventos medibles (sin implementar sin autorización)
+
+| Evento | Descripción | Implementación |
+|--------|-------------|----------------|
+| `view_page` | Visita a cualquier página | Logs del servidor |
+| `click_servicio` | Click en enlace de servicio | Parámetro URL `?servicio=` |
+| `click_contacto` | Click en enlace de contacto (Instagram, email, WhatsApp) | Enlaces de salida |
+| `submit_formulario` | Envío de formulario de contacto | Respuesta de Formspree |
+| `view_proyecto` | Visita a página de proyecto detalla | Logs del servidor |
+
+---
+
+## 7. Bloqueos comerciales (sin datos del estudio no se puede publicar comercialmente)
+
+| Bloqueo | Ubicación | Resuelve |
+|---------|-----------|----------|
+| `studio.email` vacío | `data/site.json:8` | El estudio |
+| `studio.whatsapp` vacío | `data/site.json:9` | El estudio (opcional) |
+| Domicilio completo | Aviso de privacidad `[PENDIENTE]` | El estudio |
+| Responsable protección de datos | Aviso de privacidad `[PENDIENTE]` | El estudio |
+| Revisión legal aviso privacidad | `scripts/build.mjs` (buildPrivacidadPage) | El estudio + asesoría legal |
+| `FORMSPREE_ENDPOINT` | GitHub Actions Secrets | El estudio |
+| `NEWSLETTER_ENDPOINT` | GitHub Actions Secrets | El estudio (opcional) |
+| Dominio propio + DNS | GitHub Pages + registrador | El estudio (opcional) |
+
+---
+
+## 8. Próxima tarea recomendada
 
 ### Inmediato (sin depender del estudio)
-1. Commit de cambios pendientes: `public/assets/css/main.css`, `scripts/build.mjs`, `MASTER_PLAN.md`, `CHANGELOG.md`
+1. Commit de cambios pendientes: `scripts/build.mjs`, `public/assets/css/main.css`, `public/assets/js/main.js`, `MASTER_PLAN.md`, `CHANGELOG.md`
 2. Ejecutar `npm run build` y `npm run check` tras el commit para verificar integridad
+3. Revisar HTML generado en `dist/` para confirmar CTA primario y sección Cómo empezar
 
 ### Pendiente del estudio (bloqueos comerciales)
 1. Aportar `studio.email` y `studio.whatsapp` en `data/site.json`
