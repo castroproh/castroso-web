@@ -697,8 +697,8 @@ function buildHomePage() {
             </h1>
             <p class="hero-lead">Diseño gráfico, dirección de arte, fotografía y producción audiovisual desde Culiacán, Sinaloa. Construimos piezas con intención para marcas, artistas y proyectos que buscan una voz propia.</p>
             <div class="hero-actions">
-                <a class="btn btn-primary" href="${asset('/proyectos/')}">Ver el archivo <span aria-hidden="true">↗</span></a>
-                <a class="link-arrow" href="${asset('/contacto/')}">Cuéntanos tu proyecto <span aria-hidden="true">→</span></a>
+                <a class="btn btn-primary btn-lg" href="${asset('/contacto/')}">Cuéntanos tu proyecto <span aria-hidden="true">→</span></a>
+                <a class="link-arrow" href="${asset('/proyectos/')}">Ver el archivo <span aria-hidden="true">↗</span></a>
             </div>
             <ul class="hero-disciplines" aria-label="Disciplinas del estudio">
                 <li><span>01</span> Diseño gráfico</li>
@@ -822,6 +822,35 @@ function buildHomePage() {
             </div>
             ${buildTeamPortrait(mateo, { className: 'portrait--teaser portrait--teaser-a', sizes: '(max-width: 860px) 46vw, 28vw' })}
             ${buildTeamPortrait(santiel, { className: 'portrait--teaser portrait--teaser-b', sizes: '(max-width: 860px) 46vw, 28vw' })}
+        </div>
+    </div>
+</section>
+
+<section class="how-to-start" aria-labelledby="how-to-start-title">
+    <div class="container">
+        ${buildSectionHead({
+            eyebrow: '04.5 / Cómo empezar',
+            title: 'Tres pasos para trabajar juntos',
+            link: asset('/contacto/'),
+            linkLabel: 'Iniciar una conversación',
+            id: 'how-to-start-title'
+        })}
+        <div class="steps-grid">
+            <div class="step">
+                <span class="step-num">01</span>
+                <h3>Contacto</h3>
+                <p>Escríbenos por el formulario, Instagram o WhatsApp. Cuéntanos qué necesitas y en qué rango de inversión piensas.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">02</span>
+                <h3>Propuesta</h3>
+                <p>Te enviamos una propuesta con alcance, entregables, tiempos y costo. Sin sorpresas ni letras chicas.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">03</span>
+                <h3>Producción</h3>
+                <p>Diseñamos, fotografiamos, grabamos o desarrollamos. Entregamos archivos finales y guías de uso.</p>
+            </div>
         </div>
     </div>
 </section>

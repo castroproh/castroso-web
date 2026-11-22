@@ -1592,6 +1592,64 @@ textarea.form-input { resize: vertical; min-height: 140px; }
 .studio-teaser .portrait--teaser-a { margin-top: 0; }
 .studio-teaser .portrait--teaser-b { margin-top: clamp(1.5rem, 3.5vw, 3.5rem); }
 
+/* --------------------------------------------------------------------------
+   Cómo empezar — tres pasos
+   -------------------------------------------------------------------------- */
+
+.how-to-start { padding-block: clamp(3rem, 6.5vw, 6.5rem); }
+
+.how-to-start .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: clamp(1.5rem, 3vw, 2.2rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--ink-1);
+}
+
+.step-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+}
+
+.step h3 {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0;
+}
+
+.step p {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+    margin: 0;
+    flex: 1;
+}
+
+@media (max-width: 1024px) {
+    .how-to-start .steps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .how-to-start .steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .cta-section {
     background: var(--azul);
     color: var(--paper);
