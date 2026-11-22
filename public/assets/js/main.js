@@ -344,8 +344,9 @@
         const form = $('#contact-form');
         if (!form) return;
 
-        const wanted = new URLSearchParams(window.location.search).get('servicio');
-        if (!wanted) return;
+        const params = new URLSearchParams(window.location.search);
+        const wanted = params.get('servicio');
+        const servicioEspecifico = params.get('servicio_especifico');
 
         const select = form.querySelector('select[name="servicio"]');
         if (!select) return;
@@ -374,6 +375,15 @@
         if (target) {
             select.value = target;
             select.setAttribute('aria-invalid', 'false');
+        }
+
+        // Pre-cotizar: menciona el servicio específico en la descripción si está vacía
+        if (servicioEspecifico) {
+            const descripcion = form.querySelector('textarea[name="descripcion"]');
+            if (descripcion && !descripcion.value.trim()) {
+                descripcion.value = `Servicio de interés: ${servicioEspecifico}\n\n`;
+                descripcion.setAttribute('aria-invalid', 'false');
+            }
         }
     };
 
