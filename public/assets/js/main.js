@@ -350,6 +350,14 @@
         const select = form.querySelector('select[name="servicio"]');
         if (!select) return;
 
+        // Conserva el servicio exacto elegido desde el catálogo para que
+        // la solicitud no pierda detalle al mapearlo a su disciplina.
+        const selectedServiceId = CONFIG.serviceCategories?.[wanted] ? wanted : '';
+        const serviceIdField = form.querySelector('input[name="servicio_id"]');
+        if (serviceIdField && selectedServiceId) {
+            serviceIdField.value = selectedServiceId;
+        }
+
         const norm = (value) => String(value)
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')

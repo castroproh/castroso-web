@@ -1072,7 +1072,7 @@ function buildServicesList() {
                             <ul>${(service.includes || []).map(item => `<li>${e(item)}</li>`).join('')}</ul>
                         </details>
                         ${service.examples && service.examples.length > 0 ? `<p class="service-examples"><span>Ejemplo</span> ${service.examples.map(e).join(' · ')}</p>` : ''}
-                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(category.name)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
+                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(service.id)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
                     </article>
                     `).join('')}
                 </div>
@@ -1435,6 +1435,7 @@ function buildContactoPage() {
             </div>
             <form class="contact-form" id="contact-form" method="post" novalidate>
                 <input type="hidden" name="${siteConfig.contact.honeypot_field}" value="" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="servicio_id" value="">
                 ${fieldMarkup}
                 <button type="submit" class="btn btn-primary btn-block">${e(siteConfig.contact.submit_text)} <span aria-hidden="true">→</span></button>
                 <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. El envío externo solo debe activarse con un proveedor real y documentado.</p>
