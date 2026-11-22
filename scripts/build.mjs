@@ -270,7 +270,7 @@ function buildFooter() {
         <div class="footer-top">
             <div class="footer-brand">
                 <a href="${asset('/')}" class="footer-logo-link" aria-label="${e(siteConfig.studio.name)} — Inicio">
-                    <img src="${asset('/assets/logos/Isotipo/Isotipo_color.svg')}" alt="" width="64" height="38" class="footer-logo" loading="lazy">
+                    <img src="${asset('/assets/logos/Isotipo/Isotipo_color.svg')}" alt="" aria-hidden="true" width="64" height="38" class="footer-logo" loading="lazy">
                 </a>
                 <p class="footer-tagline">${e(siteConfig.studio.tagline)}</p>
                 <p class="footer-desc">${e(siteConfig.studio.description)}</p>

@@ -111,6 +111,28 @@
 }
 
 /* --------------------------------------------------------------------------
+   01b. Tipografías locales (WOFF2)
+   -------------------------------------------------------------------------- */
+
+@font-face {
+    font-family: 'Sora';
+    src: url('../fonts/Sora-VariableFont_wght.woff2') format('woff2');
+    font-weight: 1 1000;
+    font-stretch: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('../fonts/JetBrainsMono-VariableFont_wght.woff2') format('woff2');
+    font-weight: 1 1000;
+    font-stretch: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
    02. Reset & base
    -------------------------------------------------------------------------- */
 
