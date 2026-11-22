@@ -64,8 +64,18 @@ El formulario de contacto valida campos en el navegador, pero no transmite datos
 
 Antes de habilitar envíos o completar la publicación comercial, consulta [PENDIENTES_PUBLICACION.md](PENDIENTES_PUBLICACION.md). El aviso de privacidad contiene campos pendientes de información real y revisión legal; no debe considerarse aprobado para uso comercial.
 
-## GitHub Pages
+## GitHub Pages y dominio propio
 
-`.github/workflows/deploy.yml` ejecuta `npm ci`, `npm run build` en Node 22 y despliega `dist/` con GitHub Pages al actualizar `main` o iniciar manualmente el workflow. Las variables `FORMSPREE_ENDPOINT` y `NEWSLETTER_ENDPOINT` se leen de Actions Secrets y deben configurarse únicamente cuando los servicios estén contratados/configurados. No se requiere un deploy manual paralelo.
+`.github/workflows/deploy.yml` ejecuta `npm ci`, `npm run build` en Node 22 y despliega `dist/` con GitHub Pages al actualizar `main` o iniciar manualmente el workflow.
 
-El dominio propio es opcional. Configúralo en GitHub Pages solo después de decidirlo y completar su configuración DNS. El generador produce `CNAME` únicamente cuando `CUSTOM_DOMAIN` está definido.
+Los endpoints de Formspree se configuran como **Actions Secrets**:
+- `FORMSPREE_ENDPOINT` (contacto; requerido para recibir solicitudes).
+- `NEWSLETTER_ENDPOINT` (newsletter; opcional).
+
+No se requiere un deploy manual paralelo.
+
+El dominio propio es opcional. El workflow admite la **Actions repository variable** `CUSTOM_DOMAIN`:
+- Si está vacía o no existe, conserva la URL actual `https://castroproh.github.io/castroso-web/`.
+- Si contiene `castroso.jpg`, compila con `BASE_PATH` vacío, `SITE_URL=https://castroso.jpg` y genera `dist/CNAME`.
+
+Configura `CUSTOM_DOMAIN` únicamente después de registrar el dominio, preparar los DNS y agregar `castroso.jpg` en Settings → Pages. Sigue [GUIA_DOMINIO_CASTROSO_JPG.md](GUIA_DOMINIO_CASTROSO_JPG.md). No guardes endpoints, contraseñas ni tokens en archivos versionados.
