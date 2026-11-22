@@ -11,6 +11,7 @@ Todos los cambios notables al sitio y al repositorio se documentan aquí.
 ### Modificado
 - `public/assets/css/main.css`: +22 líneas (tipografías locales).
 - `scripts/build.mjs`: +1 línea (accesibilidad isotipo footer).
+- `.github/workflows/deploy.yml`: `node-version` de `'22'` a `'lts/*'` para coincidir con el entorno local (Node 26).
 
 ### Verificado
 - `npm run build`: 10 HTML generados (index, proyectos, servicios, estudio, contacto, privacidad, 404, 500, 2 proyectos).

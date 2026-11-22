@@ -44,13 +44,18 @@
 ### Estado git (actualizado tras P0-T1)
 
 - Rama: `diseno/evolucion-editorial-2026`
-- Sincronizada con `origin/diseno/evolucion-editorial-2026` (commit `6ac1e12` traído vía `git pull --ff-only`)
-- Cambios no comiteados: `public/assets/css/main.css` (+22 líneas: @font-face Sora + JetBrains Mono), `scripts/build.mjs` (+1 línea: `aria-hidden="true"` isotipo footer)
-- Archivos sin seguimiento: `MASTER_PLAN.md`, `CHANGELOG.md`
+- Sincronizada con `origin/diseno/evolucion-editorial-2026`
+- Último commit: `4b0075e` (fix: Node LTS en GitHub Actions)
+- Cambios no comiteados: ninguno (working tree limpio)
 
 ---
 
 ## QA — Última comprobación (2026-11-22)
+
+- `npm run build`: 10 HTML generados, sin errores
+- `npm run check`: 454 referencias locales válidas, sitemap y robots correctos
+- `node --check`: sintaxis de `.mjs` y `.js` correcta
+- Cambio aplicado: `.github/workflows/deploy.yml` Node `22` → `lts/*`
 
 ### 1. Menú responsive (Chromium 375px y 768px)
 
