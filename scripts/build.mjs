@@ -1165,7 +1165,7 @@ function buildServicesList() {
                             <ul>${(service.includes || []).map(item => `<li>${e(item)}</li>`).join('')}</ul>
                         </details>
                         ${service.examples && service.examples.length > 0 ? `<p class="service-examples"><span>Ejemplo</span> ${service.examples.map(e).join(' · ')}</p>` : ''}
-                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(category.name)}&servicio_especifico=${encodeURIComponent(service.name)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
+                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(svc.id)}&servicio_especifico=${encodeURIComponent(svc.name)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
                     </article>
                     `).join('')}
                 </div>
@@ -1528,6 +1528,7 @@ function buildContactoPage() {
             </div>
             <form class="contact-form" id="contact-form" method="post" novalidate>
                 <input type="hidden" name="${siteConfig.contact.honeypot_field}" value="" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="servicio_id" value="">
                 ${fieldMarkup}
                 <label class="form-field form-field--consent"><input type="checkbox" name="privacy_consent" value="yes" required> <span>He leído y acepto el <a href="${asset('/privacidad/')}">aviso de privacidad</a>.</span></label>
                 <button type="submit" class="btn btn-primary btn-block">${e(siteConfig.contact.submit_text)} <span aria-hidden="true">→</span></button>

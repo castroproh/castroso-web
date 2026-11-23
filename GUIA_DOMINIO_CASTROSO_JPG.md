@@ -4,7 +4,7 @@
 
 ## 1. Aclaración indispensable: `castroso.jpg` no es un dominio
 
-`.jpg` **no es un TLD delegado** en la zona raíz de IANA. Por eso `castroso.jpg` **no se puede registrar** como dominio. El nombre de la marca puede seguir siendo CASTROSO.JPG (el “.JPG” funciona como guiño visual), pero el sitio necesita un dominio real.
+`.jpg` **no es un TLD delegado** en la zona raíz de IANA. Por eso `castroso.jpg` **no se puede registrar** como dominio. El nombre de la marca puede seguir siendo CASTROSO.JPG (el "JPG" funciona como guiño visual), pero el sitio necesita un dominio real.
 
 Alternativas a evaluar con un registrador (la disponibilidad y el precio deben verificarse al momento de comprar):
 
@@ -12,7 +12,7 @@ Alternativas a evaluar con un registrador (la disponibilidad y el precio deben v
 |---|---|---|
 | `castrosojpg.com` | Universal, fácil de recordar | Verificar disponibilidad y renovación |
 | `castrosojpg.mx` | Identidad mexicana | Puede requerir datos fiscales; verificar requisitos |
-| `castrosojpg.studio` | Coherente con “estudio creativo” | Suele costar más que .com |
+| `castrosojpg.studio` | Coherente con "estudio creativo" | Suele costar más que .com |
 | `castrosojpg.design` | Coherente con diseño | Suele costar más que .com |
 | `castrosojpg.art` | Coherente con lo editorial/experimental | Suele costar más que .com |
 
@@ -24,8 +24,7 @@ Alternativas a evaluar con un registrador (la disponibilidad y el precio deben v
 - Para compra, cuenta y cualquier compromiso de pago debe intervenir una persona adulta autorizada.
 - Confirmar que el repositorio correcto es `castroproh/castroso-web` y que GitHub Pages se publicará mediante GitHub Actions.
 - Verificar el dominio personalizado desde GitHub antes de crear registros DNS, siguiendo la recomendación de GitHub contra la apropiación de dominios.
-- No crear registros DNS comodín (`*`).
-- No copiar valores DNS de otro proveedor: confirmarlos en la documentación oficial y en **Settings → Pages** al momento de configurar.
+- No crear registros DNS comodín (`*`).- No copiar valores DNS de otro proveedor: confirmarlos en la documentación oficial y en **Settings → Pages** al momento de configurar.
 
 ## 3. Orden recomendado (cuando exista dominio aprobado)
 

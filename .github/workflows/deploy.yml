@@ -1,6 +1,9 @@
 name: Build and deploy CASTROSO.JPG
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       confirm_production_deploy:
@@ -33,6 +36,26 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # CUSTOM_DOMAIN is an Actions repository variable (not a secret).
+      # Leave it empty to keep the current project URL; set it to castroso.jpg
+      # only after the domain is configured in GitHub Pages and its DNS is ready.
+      - name: Configure build target
+        shell: bash
+        env:
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+        run: |
+          if [[ -n "${CUSTOM_DOMAIN:-}" ]]; then
+            echo "BASE_PATH=" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${CUSTOM_DOMAIN}" >> "$GITHUB_ENV"
+            echo "CUSTOM_DOMAIN=${CUSTOM_DOMAIN}" >> "$GITHUB_ENV"
+            echo "Using custom domain: ${CUSTOM_DOMAIN}"
+          else
+            echo "BASE_PATH=/${GITHUB_REPOSITORY#*/}/" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io" >> "$GITHUB_ENV"
+            echo "CUSTOM_DOMAIN=" >> "$GITHUB_ENV"
+            echo "Using default GitHub Pages project URL"
+          fi
 
       - name: Build site
         run: npm run build
@@ -73,13 +96,16 @@ jobs:
             exit 1
           fi
 
+      - name: Verify generated site
+        run: npm run check
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
-    if: ${{ inputs.confirm_production_deploy == true && vars.RELEASE_APPROVED == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm_production_deploy == true && vars.RELEASE_APPROVED == 'true' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
