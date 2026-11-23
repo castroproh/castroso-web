@@ -14,8 +14,74 @@ const PUBLIC = path.join(ROOT, 'public');
 const DATA = path.join(ROOT, 'data');
 const DIST = path.join(ROOT, 'dist');
 
-const BASE_PATH = (process.env.BASE_PATH ?? '/castroso-web/').replace(/\/$/, '');
-const SITE_URL = (process.env.SITE_URL ?? 'https://castroproh.github.io').replace(/\/$/, '');
+function normalizeCustomDomain(rawValue) {
+    const value = String(rawValue || '').trim().toLowerCase();
+    if (!value) return '';
+    if (value.includes('://') || value.includes('/') || value.includes(':') || value.includes('?') || value.includes('#')) {
+        throw new Error('CUSTOM_DOMAIN debe contener únicamente un hostname, sin protocolo, ruta ni puerto.');
+    }
+    const url = new URL(`https://${value}`);
+    const hostnamePattern = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+    if (url.hostname !== value || !hostnamePattern.test(value)) {
+        throw new Error('CUSTOM_DOMAIN no es un hostname válido.');
+    }
+    return value;
+}
+
+function normalizeBasePath(rawValue) {
+    const value = String(rawValue ?? '').trim();
+    if (value === '') return '';
+    if (value.includes('..') || value.includes('?') || value.includes('#')) {
+        throw new Error('BASE_PATH contiene segmentos o caracteres no permitidos.');
+    }
+    const leading = value.startsWith('/') ? value : `/${value}`;
+    return `${leading.replace(/\/+$/, '')}/`;
+}
+
+function normalizeSiteUrl(rawValue) {
+    const parsed = new URL(String(rawValue || ''));
+    const isLocalHttp = process.env.NODE_ENV !== 'production' && parsed.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(parsed.hostname);
+    if (parsed.protocol !== 'https:' && !isLocalHttp) {
+        throw new Error('SITE_URL debe usar HTTPS (HTTP solo está permitido en localhost durante desarrollo).');
+    }
+    if (parsed.username || parsed.password || parsed.pathname !== '/' || parsed.search || parsed.hash) {
+        throw new Error('SITE_URL debe ser un origen HTTPS, sin credenciales, ruta, query ni fragmento.');
+    }
+    return parsed.origin;
+}
+
+function securePublicEndpoint(rawValue, label) {
+    const value = String(rawValue || '').trim();
+    if (!value) return '';
+    const parsed = new URL(value);
+    const isLocalHttp = process.env.NODE_ENV !== 'production' && parsed.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(parsed.hostname);
+    if (parsed.protocol !== 'https:' && !isLocalHttp) {
+        throw new Error(`${label} debe usar HTTPS (HTTP solo está permitido en localhost durante desarrollo).`);
+    }
+    if (parsed.username || parsed.password || parsed.hash || parsed.search) {
+        throw new Error(`${label} no puede contener credenciales, query strings ni fragmentos URL.`);
+    }
+    return parsed.toString();
+}
+
+const CUSTOM_DOMAIN = normalizeCustomDomain(process.env.CUSTOM_DOMAIN);
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH ?? (CUSTOM_DOMAIN ? '/' : '/castroso-web/'));
+const SITE_URL = normalizeSiteUrl(process.env.SITE_URL ?? (CUSTOM_DOMAIN ? `https://${CUSTOM_DOMAIN}` : 'https://castroproh.github.io'));
+
+// Los endpoints que transmiten datos personales permanecen desactivados por defecto.
+// Para habilitarlos en un build de producción se requieren DOS banderas explícitas:
+// consentimiento/revisión legal registrada y activación operacional aprobada.
+const privacyApprovedForBuild = process.env.PUBLIC_LEADS_PRIVACY_APPROVED === 'true';
+const contactEndpointsEnabled = privacyApprovedForBuild && process.env.CONTACT_ENDPOINTS_ENABLED === 'true';
+const formspreeEndpoint = contactEndpointsEnabled
+    ? securePublicEndpoint(process.env.FORMSPREE_ENDPOINT, 'FORMSPREE_ENDPOINT')
+    : '';
+const mainLeadsEndpoint = contactEndpointsEnabled
+    ? securePublicEndpoint(process.env.MAIN_LEADS_ENDPOINT, 'MAIN_LEADS_ENDPOINT')
+    : '';
+// El newsletter implica una finalidad secundaria y no tiene todavía un consentimiento
+// independiente en la interfaz: no se inyecta endpoint hasta implementar ese consentimiento.
+const newsletterEndpoint = '';
 
 function readJSON(file) {
     return JSON.parse(fs.readFileSync(path.join(DATA, file), 'utf-8'));
@@ -438,7 +504,7 @@ function buildOrganizationJSONLD() {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": siteConfig.studio.name,
-        "url": SITE_URL,
+        "url": `${SITE_URL}${asset('/')}`,
         "logo": `${SITE_URL}${asset('/assets/logos/Imagotipo/Imagotipo_horizontal_color.svg')}`,
         "sameAs": [siteConfig.studio.instagram].filter(Boolean),
         "address": {
@@ -456,15 +522,8 @@ function buildWebSiteJSONLD() {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": siteConfig.studio.name,
-        "url": SITE_URL,
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": `${SITE_URL}${asset('/proyectos/?q={search_term_string}')}`
-            },
-            "query-input": "required name=search_term_string"
-        }
+        "url": `${SITE_URL}${asset('/')}`,
+        "inLanguage": "es-MX"
     };
 }
 
@@ -509,17 +568,22 @@ async function build() {
 
     copyDir(PUBLIC, DIST);
 
-    const configJs = `window.CASTROSO_CONFIG = {
-    basePath: "${BASE_PATH}",
-    siteUrl: "${SITE_URL}",
-    formspreeEndpoint: "${process.env.FORMSPREE_ENDPOINT || ''}",
-    newsletterEndpoint: "${process.env.NEWSLETTER_ENDPOINT || ''}",
-    serviceCategories: ${JSON.stringify(Object.fromEntries(servicesData.categories.flatMap(category =>
-        category.services.map(service => [service.id, category.name])
-    )))},
-    studio: ${JSON.stringify(siteConfig.studio)},
-    contact: ${JSON.stringify(siteConfig.contact)}
-};`;
+    const clientConfig = {
+        basePath: BASE_PATH,
+        siteUrl: SITE_URL,
+        formspreeEndpoint,
+        mainLeadsEndpoint,
+        newsletterEndpoint,
+        contactEndpointsEnabled,
+        privacyApprovedForBuild,
+        newsletterEnabled: false,
+        serviceCategories: Object.fromEntries(servicesData.categories.flatMap(category =>
+            category.services.map(service => [service.id, category.name])
+        )),
+        studio: siteConfig.studio,
+        contact: siteConfig.contact,
+    };
+    const configJs = `window.CASTROSO_CONFIG = ${JSON.stringify(clientConfig)};\n`;
     writeFile(path.join(DIST, 'assets/js/config.js'), configJs);
 
     const manifest = {
@@ -660,8 +724,8 @@ async function build() {
     generateRobots();
     writeFile(path.join(DIST, '.nojekyll'), '');
 
-    if (process.env.CUSTOM_DOMAIN) {
-        writeFile(path.join(DIST, 'CNAME'), process.env.CUSTOM_DOMAIN);
+    if (CUSTOM_DOMAIN) {
+        writeFile(path.join(DIST, 'CNAME'), `${CUSTOM_DOMAIN}\n`);
     }
 
     console.log('\n✨ Build completado en dist/');
@@ -1465,9 +1529,13 @@ function buildContactoPage() {
             <form class="contact-form" id="contact-form" method="post" novalidate>
                 <input type="hidden" name="${siteConfig.contact.honeypot_field}" value="" tabindex="-1" autocomplete="off">
                 ${fieldMarkup}
+                <label class="form-field form-field--consent"><input type="checkbox" name="privacy_consent" value="yes" required> <span>He leído y acepto el <a href="${asset('/privacidad/')}">aviso de privacidad</a>.</span></label>
                 <button type="submit" class="btn btn-primary btn-block">${e(siteConfig.contact.submit_text)} <span aria-hidden="true">→</span></button>
-                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. El envío externo solo debe activarse con un proveedor real y documentado.</p>
+                <p class="form-disclaimer">Al enviar aceptas nuestra <a href="${asset('/privacidad/')}">política de privacidad</a>. Si el envío no está disponible, puedes escribirnos por Instagram y con gusto revisamos tu proyecto.</p>
                 <div class="form-status" aria-live="polite" hidden></div>
+                <noscript>
+                    <p class="form-disclaimer">El formulario necesita JavaScript. Si prefieres, escríbenos por <a href="${igUrl}" target="_blank" rel="noopener noreferrer">Instagram (@castroso.jpg)</a>.</p>
+                </noscript>
             </form>
         </div>
     </div>
@@ -1678,9 +1746,10 @@ function generateSitemap() {
         { url: `${SITE_URL}${asset('/proyectos/')}`, changefreq: 'weekly', priority: 0.8 },
         { url: `${SITE_URL}${asset('/servicios/')}`, changefreq: 'monthly', priority: 0.8 },
         { url: `${SITE_URL}${asset('/estudio/')}`, changefreq: 'monthly', priority: 0.6 },
-        { url: `${SITE_URL}${asset('/contacto/')}`, changefreq: 'yearly', priority: 0.5 },
-        { url: `${SITE_URL}${asset('/privacidad/')}`, changefreq: 'yearly', priority: 0.3 }
+        { url: `${SITE_URL}${asset('/contacto/')}`, changefreq: 'yearly', priority: 0.5 }
     ];
+    // La página /privacidad/ se publica con noindex y robots.txt la excluye.
+    // Por coherencia, no debe anunciarse en el sitemap.
 
     for (const project of publishedProjects) {
         urls.push({
@@ -1705,16 +1774,17 @@ ${urls.map(u => `  <url>
 }
 
 function generateRobots() {
-    const base = BASE_PATH ? BASE_PATH + '/' : '/';
+    const basePrefix = BASE_PATH.replace(/\/+$/, '');
+    const rootPath = `${basePrefix}/`;
     const robots = `User-agent: *
-Allow: ${base}
+Allow: ${rootPath}
 
 Sitemap: ${SITE_URL}${asset('/sitemap.xml')}
 
 # No indexar páginas legales y de error
-Disallow: ${base}privacidad/
-Disallow: ${base}404.html
-Disallow: ${base}500.html`;
+Disallow: ${rootPath}privacidad/
+Disallow: ${rootPath}404.html
+Disallow: ${rootPath}500.html`;
     writeFile(path.join(DIST, 'robots.txt'), robots);
     console.log('   ✅ robots.txt');
 }

@@ -1,54 +1,47 @@
-# Guía — Formspree (contacto y newsletter)
+# Guía — Endpoint de contacto (Formspree o Laravel)
 
-Sitio: CASTROSO.JPG — Formularios sin servidor con Formspree
+Sitio: CASTROSO.JPG.
 
-## 1. Crear el formulario de contacto
+## Estado actual
 
-1. Ir a https://formspree.io y crear cuenta (gratis)
-2. New form → poner nombre (ej. "Contacto CASTROSO.JPG")
-3. Recibir endpoint: `https://formspree.io/f/xxxxxxxx`
-4. Copiar el endpoint
+La captación pública permanece desactivada. El build solo incluye un endpoint de contacto cuando ambas compuertas están explícitamente habilitadas:
 
-## 2. Crear el formulario de newsletter (opcional)
+- `CONTACT_ENDPOINTS_ENABLED=true`
+- `PUBLIC_LEADS_PRIVACY_APPROVED=true`
 
-1. Nuevo form en Formspree (ej. "Newsletter CASTROSO.JPG")
-2. Copiar endpoint: `https://formspree.io/f/yyyyyyyy`
+Además, la URL debe ser HTTPS. Si falta cualquiera de estas condiciones, el endpoint no se incluye en el JavaScript público.
 
-## 3. Configurar en GitHub Actions Secrets
+El newsletter permanece desactivado hasta que la interfaz tenga un consentimiento independiente y el aviso de privacidad incluya esa finalidad secundaria.
 
-Repositorio → Settings → Secrets and variables → Actions → New repository secret:
+## Elegir proveedor
 
-| Secret | Valor | Obligatorio |
-|--------|-------|-------------|
-| `FORMSPREE_ENDPOINT` | `https://formspree.io/f/xxxxxxxx` | Sí (contacto) |
-| `NEWSLETTER_ENDPOINT` | `https://formspree.io/f/yyyyyyyy` | No (newsletter) |
+Se puede evaluar un endpoint propio en Laravel o un proveedor externo como Formspree. Antes de elegir un proveedor externo, la persona adulta responsable del estudio debe revisar las condiciones vigentes, el tratamiento y almacenamiento de datos, transferencias, retención, seguridad, cuenta y cualquier coste asociado. No se presupone que exista un plan gratuito ni se contrata ningún servicio en esta guía.
 
-Estos valores se inyectan en el build mediante el workflow `.github/workflows/deploy.yml` y se escriben en `dist/assets/js/config.js`.
+No añadir credenciales privadas al JavaScript. Un endpoint de formulario que se publica en el navegador es visible para visitantes; nunca debe incluir tokens de administración o secretos.
 
-## 4. Construir localmente con Formspree (pruebas)
+## Configuración cuando exista aprobación
 
-```bash
-FORMSPREE_ENDPOINT=https://formspree.io/f/xxxxxxxx \
-NEWSLETTER_ENDPOINT=https://formspree.io/f/yyyyyyyy \
-npm run build
-```
+Si se usa Formspree, su URL real se guarda como secreto de GitHub Actions `FORMSPREE_ENDPOINT`. Si se usa Laravel, se define `MAIN_LEADS_ENDPOINT` como URL HTTPS real del endpoint `/api/public/prospects`.
 
-Sin endpoint configurado, el formulario de contacto muestra el mensaje de demo y dirige a Instagram/correo (ya definido en `data/site.json`).
+Las dos variables de activación se deben establecer solo después de:
 
-## 5. Cómo funciona el formulario
+1. Aprobar legalmente el aviso de privacidad final.
+2. Confirmar el proveedor y sus condiciones de tratamiento de datos.
+3. Configurar el endpoint HTTPS real.
+4. Configurar CORS y la allowlist exacta del origen publicado, si se utiliza Laravel.
+5. Ejecutar pruebas de staging con datos sintéticos y comprobar la recepción interna.
+6. Obtener la autorización operativa para activar la captación.
 
-- HTML5 validation (campos requeridos, tipo email, select, textarea, date)
-- Honeypot (`website_url`): si se rellena, el envío se descarta (spam)
-- Envío por AJAX al endpoint Formspree
-- Toast de éxito / error según respuesta
-- Mensajes de éxito y error personalizables en `data/site.json` → `contact.success_message` / `contact.error_message`
+## Newsletter
 
-## 6. Campos del formulario
+No crear ni configurar un endpoint de newsletter todavía. El footer no tiene un consentimiento secundario independiente para esa finalidad. El build deja `newsletterEndpoint` vacío aunque exista `NEWSLETTER_ENDPOINT` en el entorno.
+
+## Campos del formulario
 
 Definidos en `data/site.json` → `contact.form_fields`:
 
 | Campo | Tipo | Requerido |
-|-------|------|-----------|
+|---|---|---|
 | nombre | text | Sí |
 | email | email | Sí |
 | proyecto_nombre | text | Sí |
@@ -58,8 +51,8 @@ Definidos en `data/site.json` → `contact.form_fields`:
 | fecha_estimada | date | No |
 | medio_contacto | select | No |
 
-## 7. Límites del plan gratuito de Formspree
+El formulario también incluye `privacy_consent` y el honeypot configurado en `contact.honeypot_field`.
 
-- Hasta 50 envíos/mes (plan gratuito)
-- Spam protection incluida (honeybadger/captcha opcional)
-- Para más volumen, pasar a plan de pago en formspree.io
+## Pruebas locales
+
+Las pruebas del build pueden usar endpoints HTTPS sintéticos solo para comprobar el comportamiento del generador; no deben enviarse solicitudes ni datos reales. La prueba estática `npm run check:integration` compara campos con Laravel, pero no sustituye una prueba HTTP/E2E en staging.

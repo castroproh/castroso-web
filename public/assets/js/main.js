@@ -498,16 +498,25 @@
             }
 
             // Sin endpoint real no se envía nada: se informa que no está disponible
-            const endpoint = CONFIG.formspreeEndpoint;
+            const endpointsEnabled = CONFIG.contactEndpointsEnabled === true && CONFIG.privacyApprovedForBuild === true;
+            const endpoint = endpointsEnabled ? (CONFIG.mainLeadsEndpoint || CONFIG.formspreeEndpoint) : '';
             if (!endpoint) {
                 showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
                 return;
             }
 
             setLoading(true);
+            const requestController = new AbortController();
+            const requestTimeout = window.setTimeout(() => requestController.abort(), 15000);
 
             try {
                 const formData = new FormData(form);
+
+                // The public endpoint accepts the same fields as the site's contact form.
+                if (CONFIG.mainLeadsEndpoint) {
+                    formData.set('privacy_consent', formData.get('privacy_consent') || '');
+                    formData.set('telefono', '');
+                }
 
                 // Remove honeypot from submission
                 if (CONFIG.contact?.honeypot_field) {
@@ -517,14 +526,21 @@
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     body: formData,
+                    mode: 'cors',
+                    credentials: 'omit',
+                    redirect: 'error',
+                    signal: requestController.signal,
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
 
-                const result = await response.json();
+                const contentType = response.headers.get('content-type') || '';
+                const result = contentType.includes('application/json')
+                    ? await response.json()
+                    : {};
 
-                if (response.ok && result.ok) {
+                if (response.ok && (result.ok || result.received === true)) {
                     showMessage('success', successMessage);
                     form.reset();
                     
@@ -536,7 +552,7 @@
                         if (errorEl) errorEl.remove();
                     });
                 } else {
-                    showMessage('error', result.error || errorMessage);
+                    showMessage('error', result.error || result.message || errorMessage);
                     
                     // Show field errors if provided
                     if (result.errors) {
@@ -560,12 +576,9 @@
             } catch (error) {
                 console.error('Form submission error:', error);
                 
-                if (!CONFIG.formspreeEndpoint) {
-                    showMessage('warning', 'El envío de mensajes no está disponible temporalmente. Escríbenos por Instagram mientras lo habilitamos.');
-                } else {
-                    showMessage('error', 'Error de conexión. Inténtalo de nuevo o escríbenos directamente por Instagram.');
-                }
+                showMessage('error', 'No pudimos confirmar la recepción de tu solicitud. Inténtalo de nuevo más tarde o contáctanos por Instagram.');
             } finally {
+                window.clearTimeout(requestTimeout);
                 setLoading(false);
             }
         });
@@ -581,7 +594,9 @@
 
         const submitBtn = form.querySelector('button[type="submit"]');
         const emailInput = form.querySelector('input[type="email"]');
-        const endpoint = CONFIG.newsletterEndpoint;
+        const endpoint = CONFIG.newsletterEnabled === true && CONFIG.privacyApprovedForBuild === true
+            ? CONFIG.newsletterEndpoint
+            : '';
 
         if (!endpoint) {
             // No hay integración real: se informa y no se simula suscripción

@@ -1,16 +1,16 @@
-
-name: Deploy CASTROSO.JPG to GitHub Pages
+name: Build and deploy CASTROSO.JPG
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      confirm_production_deploy:
+        description: "Confirmar explícitamente el despliegue público (requiere además RELEASE_APPROVED=true en Variables)."
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -19,13 +19,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -41,10 +37,41 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          BASE_PATH: /${{ github.event.repository.name }}/
-          SITE_URL: https://${{ github.repository_owner }}.github.io
+          NODE_ENV: production
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          BASE_PATH: ${{ vars.CUSTOM_DOMAIN != '' && '/' || format('/{0}/', github.event.repository.name) }}
+          SITE_URL: ${{ vars.CUSTOM_DOMAIN != '' && format('https://{0}', vars.CUSTOM_DOMAIN) || format('https://{0}.github.io', github.repository_owner) }}
+          CONTACT_ENDPOINTS_ENABLED: ${{ vars.CONTACT_ENDPOINTS_ENABLED }}
+          PUBLIC_LEADS_PRIVACY_APPROVED: ${{ vars.PUBLIC_LEADS_PRIVACY_APPROVED }}
           FORMSPREE_ENDPOINT: ${{ secrets.FORMSPREE_ENDPOINT }}
-          NEWSLETTER_ENDPOINT: ${{ secrets.NEWSLETTER_ENDPOINT }}
+          MAIN_LEADS_ENDPOINT: ${{ vars.MAIN_LEADS_ENDPOINT }}
+          # Newsletter remains disabled until there is independent consent in the UI.
+
+      - name: Check site
+        run: npm run check
+        env:
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          BASE_PATH: ${{ vars.CUSTOM_DOMAIN != '' && '/' || format('/{0}/', github.event.repository.name) }}
+          SITE_URL: ${{ vars.CUSTOM_DOMAIN != '' && format('https://{0}', vars.CUSTOM_DOMAIN) || format('https://{0}.github.io', github.repository_owner) }}
+          CONTACT_ENDPOINTS_ENABLED: ${{ vars.CONTACT_ENDPOINTS_ENABLED }}
+          PUBLIC_LEADS_PRIVACY_APPROVED: ${{ vars.PUBLIC_LEADS_PRIVACY_APPROVED }}
+
+      - name: Check web-to-Laravel contract
+        run: npm run check:integration
+
+      - name: Check static Pages export safety
+        run: npm run check:pages
+        env:
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          BASE_PATH: ${{ vars.CUSTOM_DOMAIN != '' && '/' || format('/{0}/', github.event.repository.name) }}
+          SITE_URL: ${{ vars.CUSTOM_DOMAIN != '' && format('https://{0}', vars.CUSTOM_DOMAIN) || format('https://{0}.github.io', github.repository_owner) }}
+
+      - name: Block deploy while the privacy notice is a draft
+        run: |
+          if grep -q '\[PENDIENTE' dist/privacidad/index.html; then
+            echo "::error::El aviso de privacidad conserva marcadores [PENDIENTE]. No se despliega hasta la revisión legal."
+            exit 1
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -52,14 +79,21 @@ jobs:
           path: ./dist
 
   deploy:
+    if: ${{ inputs.confirm_production_deploy == true && vars.RELEASE_APPROVED == 'true' }}
     needs: build
     runs-on: ubuntu-latest
-
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
