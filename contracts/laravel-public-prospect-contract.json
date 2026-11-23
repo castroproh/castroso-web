@@ -1,80 +1,91 @@
 {
   "version": "1.0.0",
-  "description": "Contrato público de captación de prospectos para CASTROSO.JPG - solo campos y comportamientos visibles en el formulario estatico",
-  "endpoints": {
-    "cotizacion": {
-      "metodo": "POST",
-      "url": "/cotizaciones",
-      "requiere_autenticacion": false,
-      "campos_obligatorios": [
-        "servicio",
-        "servicio_especifico"
-      ],
-      "campos_opcionales": [
-        "client_id",
-        "modalidad",
-        "alcance",
-        "entregables",
-        "ubicacion",
-        "notas",
-        "revisiones_incluidas"
-      ],
-      "validaciones": {
-        "servicio": {
-          "tipo": "string",
-          "descripcion": "ID exacto del servicio seleccionado",
-          "patron": "^[a-z0-9_-]+$"
-        },
-        "servicio_especifico": {
-          "tipo": "string",
-          "descripcion": "Nombre legible del servicio para mostrarse en la descripción"
-        }
-      },
-      "estructuras_item": {
-        "service_id": {
-          "tipo": "integer",
-          "descripcion": "ID del servicio en la tabla services",
-          "validacion_externa": "debe existir en la tabla services del Laravel"
-        },
-        "nombre": {
-          "tipo": "string",
-          "descripcion": "Nombre legible del servicio para mostrarse en la UI"
-        },
-        "cantidad": {
-          "tipo": "integer",
-          "min": 1,
-          "max": 999,
-          "descripcion": "Numero de unidades o piezas"
-        },
-        "precio_unitario": {
-          "tipo": "number",
-          "min": 0,
-          "max": 9999999,
-          "descripcion": "Precio unitario del servicio"
-        }
-      },
-      "seguridad": {
-        "honeypot": {
-          "campo": "hidden_field_name",
-          "valor_esperado": "",
-          "descripcion": "Campo oculto para bots, debe estar vacio"
-        },
-        "privacy_consent": {
-          "tipo": "checkbox",
-          "requerido": true,
-          "descripcion": "Consentimiento para el aviso de privacidad"
-        },
-        "double_privacy_block": {
-          "requerido": true,
-          "bandera_1": "PUBLIC_LEADS_PRIVACY_APPROVED debe ser 'true'",
-          "bandera_2": "CONTACT_ENDPOINTS_ENABLED debe ser 'true'"
-        },
-        "newsletter": {
-          "estado_predeterminado": "desactivado",
-          "condicion": "requiere consentimiento explicito y proveedor documentado"
-        }
-      }
+  "description": "Contrato público de captación de prospectos para CASTROSO.JPG - validado contra Laravel real",
+  "ruta_laravel": "/public/prospects",
+  "metodo": "POST",
+  "campos_obligatorios": [
+    "nombre",
+    "email",
+    "proyecto_nombre",
+    "servicio",
+    "servicio_especifico",
+    "descripcion"
+  ],
+  "campos_opcionales": [
+    "presupuesto",
+    "fecha_estimada",
+    "medio_contacto",
+    "telefono",
+    "website_url"
+  ],
+  "validaciones": {
+    "nombre": {
+      "tipo": "string",
+      "requerido": true,
+      "max": 150,
+      "patron_email": false
+    },
+    "email": {
+      "tipo": "string",
+      "requerido": true,
+      "max": 150,
+      "patron_email": true
+    },
+    "proyecto_nombre": {
+      "tipo": "string",
+      "requerido": true,
+      "max": 150
+    },
+    "servicio": {
+      "tipo": "string",
+      "requerido": true,
+      "max": 120
+    },
+    "servicio_especifico": {
+      "tipo": "string",
+      "requerido": false,
+      "max": 150
+    },
+    "descripcion": {
+      "tipo": "string",
+      "requerido": true,
+      "max": 2000
+    },
+    "presupuesto": {
+      "tipo": "string",
+      "requerido": false,
+      "max": 100
+    },
+    "fecha_estimada": {
+      "tipo": "date",
+      "requerido": false,
+      "after_or_equal": "today"
+    },
+    "medio_contacto": {
+      "tipo": "string",
+      "requerido": false,
+      "max": 40
+    },
+    "telefono": {
+      "tipo": "string",
+      "requerido": false,
+      "regex": "^\\+?[0-9 ]{10,15}$"
+    },
+    "website_url": {
+      "tipo": "string",
+      "requerido": false,
+      "max": 200
     }
   },
-  "notas": "Cuando Laravel no está disponible (ej. GitHub Actions), este contrato se usa para validar los campos del sitio estatico. La validacion directa del codigo Laravel no se ejecuta en ese caso."
+  "seguridad": {
+    "privacy_consent": {
+      "tipo": "checkbox",
+      "aceptado": true,
+      "descripcion": "Must be accepted field"
+    },
+    "honeypot_esperado": "",
+    "rate_limit": "throttle:public-leads"
+  },
+  "origen": "Laravel real en /Users/castrohernandez/Downloads/Castroso.jpg_web-main",
+  "notas": "Generado a partir de la inspección del código Laravel real. No contiene información privada ni secretos."
 }
