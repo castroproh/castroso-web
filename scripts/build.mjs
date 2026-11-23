@@ -1165,7 +1165,7 @@ function buildServicesList() {
                             <ul>${(service.includes || []).map(item => `<li>${e(item)}</li>`).join('')}</ul>
                         </details>
                         ${service.examples && service.examples.length > 0 ? `<p class="service-examples"><span>Ejemplo</span> ${service.examples.map(e).join(' · ')}</p>` : ''}
-                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(svc.id)}&servicio_especifico=${encodeURIComponent(svc.name)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
+                        <a href="${asset('/contacto/')}?servicio=${encodeURIComponent(service.id)}&servicio_especifico=${encodeURIComponent(service.name)}" class="link-arrow service-cta">Cotizar <span aria-hidden="true">→</span></a>
                     </article>
                     `).join('')}
                 </div>

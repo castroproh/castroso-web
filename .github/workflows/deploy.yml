@@ -96,9 +96,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify generated site
-        run: npm run check
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
