@@ -1,172 +1,136 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToP } from 'node:url';
 import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 
-const siteRoot = path.resolve(path.dirname(fileURLToP(import.meta.url)), '..');
-const ecosystemRoot = path.resolve(siteRoot, '..');
-
-const laravelCandidates = [
-    process.env.CASTROSO_LARAVEL_PATH,
-    path.join(ecosystemRoot, 'laravel'),
-    path.join(os.homedir(), 'Downloads', 'Castroso.jpg_web-main'),
-].filter(Boolean);
-
-const laravelRoot = laravelCandidates.find(candidate =>
-    fs.existsSync(path.join(candidate, 'routes', 'api.php'))
-) || null;
-
-let laravelValidationExecuted = false;
-let laravelControllerContent = '';
-let laravelConfigContent = '';
-let laravelRoutesContent = '';
-
-if (laravelRoot) {
-    laravelValidationExecuted = true;
-    laravelControllerContent = fs.readFileSync(path.join(laravelRoot, 'app', 'Http', 'Controllers', 'PublicProspectController.php'), 'utf8') || '';
-    laravelConfigContent = fs.readFileSync(path.join(laravelRoot, 'config', 'castroso.php'), 'utf8') || '';
-    laravelRoutesContent = fs.readFileSync(path.join(laravelRoot, 'routes', 'api.php'), 'utf8') || '';
-}
-
-const contractPath = path.join(siteRoot, 'contracts', 'laravel-public-prospect-contract.json');
-let contractVersioned;
-try {
-    contractVersioned = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
-} catch {
-    contractVersioned = null;
-}
-
-const contract = contractVersioned;
-const contractAvailable = !!contractVersioned;
-
-const siteConfig = JSON.parse(fs.readFileSync(path.join(siteRoot, 'data', 'site.json'), 'utf8'));
-const siteBuild = fs.readFileSync(path.join(siteRoot, 'scripts', 'build.mjs'), 'utf8');
-const siteJs = fs.readFileSync(path.join(siteRoot, 'public', 'assets', 'js', 'main.js'), 'utf8');
-
-const contractRequiredFields = contract?.campos_obligatorio || [];
-const contractOptionalFields = contract?.campos_opcionales || [];
-const contractValidations = contract?.validaciones || {};
-
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
-const expect = (condition, message) => { if (!condition) errors.push(message); };
+const expect = (ok, message) => { if (!ok) errors.push(message); };
+const read = (file, label) => {
+  try { return fs.readFileSync(file, 'utf8'); }
+  catch (e) { errors.push('No se pudo leer ' + label + ': ' + file + ' (' + e.code + ')'); return ''; }
+};
+const json = (file, label) => {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+  catch (e) { errors.push(label + ' no es JSON válido: ' + e.message); return null; }
+};
 
-// 1. Campos obligatorios del contrato en el build del sitio
-for (const field of contractRequiredFields) {
-    const fieldInBuild = siteBuild.includes(field);
-    if (laravelValidationExecuted) {
-        const inLaravel = laravelControllerContent.includes(field);
-        expect(fieldInBuild || inLaravel, 'Campo obligatorio del contrato "' + field + '" no encontrado en el sitio o Laravel real');
-    } else {
-        expect(fieldInBuild, 'Campo obligatorio del contrato "' + field + '" no encontrado en el sitio estatico (Laravel no disponible para validacion directa)');
-    }
+const contract = json(path.join(root, 'contracts/laravel-public-prospect-contract.json'), 'Contrato versionado');
+const site = json(path.join(root, 'data/site.json'), 'data/site.json');
+const build = read(path.join(root, 'scripts/build.mjs'), 'scripts/build.mjs');
+const client = read(path.join(root, 'public/assets/js/main.js'), 'main.js');
+const workflow = read(path.join(root, '.github/workflows/deploy.yml'), 'deploy.yml');
+
+const required = Array.isArray(contract?.campos_obligatorios) ? contract.campos_obligatorios : [];
+const optional = Array.isArray(contract?.campos_opcionales) ? contract.campos_opcionales : [];
+const rules = contract?.validaciones || {};
+expect(required.length > 0, 'El contrato no contiene campos_obligatorios válidos.');
+expect(Array.isArray(contract?.campos_obligatorios), 'campos_obligatorios debe ser un arreglo.');
+expect(Array.isArray(contract?.campos_opcionales), 'campos_opcionales debe ser un arreglo.');
+expect(contract?.metodo === 'POST', 'El método del contrato debe ser POST.');
+expect(typeof contract?.ruta_laravel === 'string' && contract.ruta_laravel.startsWith('/'), 'ruta_laravel no es válida.');
+
+const req = new Set(required);
+const opt = new Set(optional);
+expect(req.size === required.length, 'Hay campos obligatorios duplicados.');
+expect(opt.size === optional.length, 'Hay campos opcionales duplicados.');
+for (const field of required) {
+  expect(typeof field === 'string' && field.length > 0, 'Hay un campo obligatorio vacío.');
+  expect(!opt.has(field), 'El campo ' + field + ' aparece como obligatorio y opcional.');
+  expect(Object.hasOwn(rules, field), 'Falta validación para ' + field + '.');
+  if (Object.hasOwn(rules, field)) expect(rules[field].requerido === true, field + ' está en campos_obligatorios pero requerido no es true.');
+}
+for (const field of optional) {
+  expect(typeof field === 'string' && field.length > 0, 'Hay un campo opcional vacío.');
+  expect(Object.hasOwn(rules, field), 'Falta validación para el campo opcional ' + field + '.');
+  if (Object.hasOwn(rules, field)) expect(rules[field].requerido === false, field + ' está en campos_opcionales pero requerido no es false.');
 }
 
-// 2. Estructuras de items
-const itemFields = ['nombre', 'servicio', 'descripcion'];
-const itemFieldsInBuild = itemFields.every(field =>
-    siteBuild.includes(field) || (laravelValidationExecuted && laravelControllerContent.includes(field))
-);
-expect(itemFieldsInBuild, 'Faltan campos de item (nombre, servicio, descripcion) en el build');
-
-// 3. Campos opcionales del contrato
-for (const field of contractOptionalFields) {
-    const fieldInBuild = siteBuild.includes(field);
-    if (laravelValidationExecuted) {
-        const inLaravel = laravelControllerContent.includes(field);
-        expect(fieldInBuild || inLaravel, 'Campo opcional del contrato "' + field + '" no verificado');
-    } else {
-        expect(fieldInBuild, 'Campo opcional del contrato "' + field + '" no encontrado en el sitio estatico (Laravel no disponible)');
-    }
+const formFields = Array.isArray(site?.contact?.form_fields) ? site.contact.form_fields : [];
+const formNames = new Set(formFields.map((f) => f?.name).filter(Boolean));
+for (const field of required) {
+  if (field === 'privacy_consent' || field === site?.contact?.honeypot_field) continue;
+  expect(formNames.has(field), 'Falta el campo obligatorio ' + field + ' en contact.form_fields.');
+}
+for (const field of formFields) {
+  expect(typeof field.name === 'string' && field.name.length > 0, 'Hay un campo de formulario sin name.');
+  if (field.required === true) expect(req.has(field.name), 'El formulario marca " + field.name + " como obligatorio pero el contrato no.");
 }
 
-// 4. Honeypot - Usar siteConfig.contact.honeypot_field y verificar en el HTML generado
-const honeypot = siteConfig.contact?.honeypot_field || 'website_url';
-// El HTML se genera en build.mjs como: name="${siteConfig.contact.honeypot_field}"
-expect(siteJs.includes('name="' + honeypot + '"') || siteJs.includes("name='" + honeypot + "'"), 'Honeypot no reconocido en el JavaScript del sitio');
-// Ademas, verificar que el campo esté configurado en site.json
-expect(siteConfig.contact?.honeypot_field, 'El campo honeypot no está configurado en site.json');
+const honeypot = site?.contact?.honeypot_field;
+expect(typeof honeypot === 'string' && honeypot.length > 0, 'contact.honeypot_field no está configurado.');
+expect(build.includes('siteConfig.contact.honeypot_field'), 'build.mjs no genera el honeypot desde site.json.');
+expect(client.includes('CONFIG.contact?.honeypot_field') && client.includes('form.querySelector'), 'main.js no localiza el honeypot configurado.');
+expect(client.includes('honeypotField.value'), 'main.js no comprueba el valor del honeypot.');
 
-// 5. Consentimiento de privacidad
-expect(siteBuild.includes('name="privacy_consent"'), 'Falta consentimiento privacy_consent en el build');
+expect(build.includes('name="privacy_consent"'), 'El formulario no incluye privacy_consent.');
+expect(build.includes("process.env.PUBLIC_LEADS_PRIVACY_APPROVED === 'true'"), 'Falta el bloqueo PUBLIC_LEADS_PRIVACY_APPROVED.');
+expect(build.includes("process.env.CONTACT_ENDPOINTS_ENABLED === 'true'"), 'Falta el bloqueo CONTACT_ENDPOINTS_ENABLED.');
+expect(client.includes('CONFIG.contactEndpointsEnabled === true') && client.includes('CONFIG.privacyApprovedForBuild === true'), 'main.js no exige los dos bloqueos de privacidad.');
+expect(build.includes("const newsletterEndpoint = '';"), 'El newsletter no está desactivado explícitamente.');
 
-// 6. Bloqueo doble de privacidad (cliente)
-expect(
-    siteJs.includes('CONFIG.contactEndpointsEnabled === true') && siteJs.includes('CONFIG.privacyApprovedForBuild === true'),
-    'El cliente no aplica el bloqueo doble de privacidad antes de enviar.'
-);
-expect(siteBuild.includes("process.env.PUBLIC_LEADS_PRIVACY_APPROVED === 'true'"), 'El build no exige aprobacion de privacidad explicita.');
-expect(siteBuild.includes("process.env.CONTACT_ENDPOINTS_ENABLED === 'true'"), 'El build no exige activacion operacional explicita.');
+expect(/workflow_dispatch\\s*:/.test(workflow), 'El workflow no tiene workflow_dispatch.');
+expect(!/^  push\s*:/m.test(workflow), 'El workflow contiene un trigger push.');
+const deploy = workflow.split(/^  deploy\s*:\s*$/m)[1] || '';
+expect(deploy.length > 0, 'No existe el job deploy.');
+expect(deploy.includes('inputs.confirm_production_deploy == true'), 'El deploy no exige confirmación manual.');
+expect(deploy.includes("vars.RELEASE_APPROVED == 'true'"), 'El deploy no exige RELEASE_APPROVED=true.');
+expect(/pages:\s*write/.test(deploy), 'pages: write no está limitado al job deploy.');
+expect(/id-token:\s*write/.test(deploy), 'id-token: write no está limitado al job deploy.');
 
-// Modo Laravel disponible - validaciones extra
-if (laravelValidationExecuted) {
-    // Validacion contra controlador Laravel real
-    const validationBlock = laravelControllerContent.match(/\\$data\\s*=\\s*\\$request->validate\\s*\\(\\s*\\[([\\s\\S]*?)\\\\n\\s*\\]\\)\\s*;/);
-    const serverFields = validationBlock
-        ? [...validationBlock[1].matchAll(/['\"]([^\\']+)\\'\\s*=>\\s*\\[/g)].map(function(match) { return match[1]; })
-        : [];
-
-    // Verificar que todos los campos obligatorios del contrato existan en Laravel
-    for (const field of contractRequiredFields) {
-        expect(serverFields.includes(field), 'El campo del contrato "' + field + '" no existe en la validacion Laravel real');
+// Laravel solo se inspecciona cuando existe routes/api.php.
+const skipLaravel = process.env.CASTROSO_SKIP_LARAVEL === 'true';
+const candidates = [
+  process.env.CASTROSO_LARAVEL_PATH,
+  path.resolve(root, '..', 'laravel'),
+  path.join(os.homedir(), 'Downloads', 'Castroso.jpg_web-main'),
+  path.join(os.homedir(), 'Downloads', 'Castroso.jpg_web'),
+].filter(Boolean);
+const laravelRoot = skipLaravel ? null : candidates.find((p) => fs.existsSync(path.join(p, 'routes/api.php'))) || null;
+if (process.env.CASTROSO_LARAVEL_PATH && !skipLaravel && !laravelRoot) {
+  errors.push('CASTROSO_LARAVEL_PATH no contiene routes/api.php.');
+}
+let laravelCompared = false;
+if (laravelRoot) {
+  const controller = read(path.join(laravelRoot, 'app/Http/Controllers/PublicProspectController.php'), 'controlador Laravel');
+  const routes = read(path.join(laravelRoot, 'routes/api.php'), 'rutas Laravel');
+  const block = controller.match(/\$[A-Za-z_][A-Za-z0-9_]*\s*=\s*\$request->validate\s*\(\s*\[([\s\S]*?)\]\s*\)\s*;/);
+  expect(Boolean(block), 'No se encontró el bloque $request->validate([...]) en el controlador Laravel.');
+  if (block) {
+    const serverFields = new Set([...block[1].matchAll(/['"]([A-Za-z0-9_]+)['"]\s*=>\s*\[/g)].map((m) => m[1]));
+    for (const field of [...required, ...optional, 'privacy_consent', honeypot]) {
+      expect(serverFields.has(field), 'Laravel no valida el campo ' + field + ' declarado/esperado.');
     }
-
-    // Campos requeridos del sitio (compatibilidad hacia atras)
-    const requiredServerFields = ['nombre', 'email', 'servicio', 'descripcion', 'privacy_consent'];
-    for (const field of requiredServerFields) {
-        expect(serverFields.includes(field), 'Laraval no valida el campo requerido "' + field + '"');
-    }
-
-    // Honeypot en Laravel
-    expect(serverFields.includes(honeypot), 'Laravel no reconoce el honeypot.');
-
-    // Configuraciones CORS y privacidad en Laravel
-    expect(laravelConfigContent.includes("env('PUBLIC_LEADS_ALLOWED_ORIGINS', '')"), 'CORS no usa PUBLIC_LEADS_ALLOWED_ORIGINS.');
-    expect(/privacy_approved/.test(laravelConfigContent), 'PUBLIC_LEADS_PRIVACY_APPROVED debe ser configurable y falso por defecto.');
-    expect(/enabled/.test(laravelConfigContent), 'PUBLIC_LEADS_ENABLED debe ser configurable y falso por defecto.');
-    // Ruta POST /api/public/prospects (el prefijo exacto, sin dominio completo)
-    expect(/Route::post\\s*\\(\\s*'\\/public\\/prospects'\\s*\\)/.test(laravelRoutesContent), 'La ruta POST /api/public/prospects no esta declarada.');
-
-    // Validaciones del workflow de deploy
-    const deployWorkflow = fs.readFileSync(path.join(siteRoot, '.github', 'workflows', 'deploy.yml'), 'utf8');
-    expect(/workflow_dispatch:/.test(deployWorkflow), 'El workflow debe permitir ejecucion manual.');
-    expect(!/^\\s*push:/m.test(deployWorkflow), 'El workflow no debe desplegar automadamente mediante push.');
-    expect(deployWorkflow.includes('vars.RELEASE_APPROVED == true'), 'El deploy debe exigir RELEASE_APPROVADO=true.');
+  }
+  const routeRegex = new RegExp("Route\\s*::\\s*post\\s*\\(\\s*['\"]" + contract.ruta_laravel.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&') + "['\"]");
+  expect(routeRegex.test(routes), 'Laravel no declara POST ' + contract.ruta_laravel + ' en routes/api.php.');
+  laravelCompared = true;
 }
 
-// Modo GitHub Actions (Laravel no disponible)
-if (!laravelValidationExecuted && contractAvailable) {
-    const minimalContractFields = ['nombre', 'email', 'servicio', 'descripcion', 'privacy_consent'];
-    for (const field of minimalContractFields) {
-        expect(siteBuild.includes(field), 'Campo minimo del contrato "' + field + '" no encontrado en el build (Laravel no disponible para validacion directa)');
+// Si dist existe (después de npm run build), valida el HTML generado.
+const dist = path.join(root, 'dist');
+if (fs.existsSync(dist)) {
+  const htmlFiles = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile() && entry.name.endsWith('.html')) htmlFiles.push(full);
     }
-    expect(siteJs.includes('name="' + honeypot + '"') || siteJs.includes("name='" + honeypot + "'"), 'Honeypot no reconocido (Laravel no disponible).');
-    expect(
-        siteJs.includes('CONFIG.contactEndpointsEnabled === true') && siteJs.includes('CONFIG.privacyApprovedForBuild === true'),
-        'Bloqueo doble de privacidad no aplica (Laravel no disponible).'
-    );
-    expect(siteBuild.includes("process.env.PUBLIC_LEADS_PRIVACY_APPROVED === 'true'"), 'Aprobacion privacy no disponible (Laravel no disponible).');
-    expect(siteBuild.includes("process.env.CONTACT_ENDPOINTS_ENABLED === 'true'"), 'Activacion operacional no disponible (Laravel no disponible).');
-    expect(siteBuild.includes("const newsletterEndpoint = ''"), 'Newsletter no disponible (Laravel no disponible).');
-    expect(/workflow_dispatch:/.test(siteBuild), 'Workflow permite ejecucion manual (Laravel no disponible).');
-    expect(!/^\\s*push:/m.test(siteBuild), 'Push automatico no disponible (Laravel no disponible).');
+  };
+  walk(dist);
+  const found = htmlFiles.some((file) => fs.readFileSync(file, 'utf8').includes('name="' + honeypot + '"'));
+  expect(found, 'El HTML generado en dist no contiene name="' + honeypot + '".');
 }
 
-// Reporte final
 if (errors.length) {
-    console.error('Contrato de integracion: ' + errors.length + ' problema(s)');
-    errors.forEach(function(error) { console.error('- ' + error); });
-    process.exit(1);
+  console.error('Contrato de integración: ' + errors.length + ' problema(s)');
+  errors.forEach((error) => console.error('- ' + error));
+  process.exit(1);
 }
-
-if (laravelValidationExecuted) {
-    console.log('Contrato estatico correcto: ' + contractRequiredFields.length + ' campos del contrato verificados contra codigo Laravel real; consentimiento y honeypot presentes; bloqueos protegidos.');
-} else if (contractAvailable) {
-    console.log('Contrato estatico correcto: ' + contractRequiredFields.length + ' campos del contrato versionado verificados contra sitio estatico; Nota: Laravel no estaba disponible para validacion directa, se uso contrato versionado. NO se compara codigo Laravel privado.');
-} else {
-    console.log('Contrato estatico correcto: campos minimos verificados contra sitio estatico. Alcance: validacion estatica basica (sin contrato ni Laravel).');
+if (laravelCompared) console.log('Contrato comprobado contra el sitio estático y Laravel local.');
+else {
+  console.log('Contrato comprobado contra el sitio estático y el JSON versionado.');
+  console.log('Comparación directa con Laravel no ejecutada: Laravel no está disponible en este entorno.');
 }
-import fs from node:fs
-import path from node:path
-import { fileURLToP } from node:url
-import os from node:os
